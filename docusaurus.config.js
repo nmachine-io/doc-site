@@ -9,14 +9,11 @@ module.exports = {
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
 
-
-  url: 'https://endiliey.github.io', // Your website URL
-  baseUrl: '/',
-  projectName: 'site-documentation.github.io',
-  organizationName: 'nectar-cs',
+  url: 'https://nmachine-io.github.io/documentation-site/',
+  baseUrl: '/documentation-site/',
+  projectName: 'documentation-site',
+  organizationName: 'nmachine-io',
   trailingSlash: false,
-
-
 
   themeConfig: {
     navbar: {
