@@ -1,26 +1,34 @@
 const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+const darkCodeTheme = require('prism-react-renderer/themes/synthwave84');
 
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
-  title: 'My Site',
+  title: 'NMachine',
   tagline: 'Dinosaurs are cool',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
 
-  url: 'https://nmachine-io.github.io/documentation-site/',
-  baseUrl: '/documentation-site/',
+  // url: 'https://nmachine-io.github.io/documentation-site/',
+  url: "https://docs.nmachine.io/",
+  // baseUrl: '/documentation-site/',
+  baseUrl: '/',
   projectName: 'documentation-site',
   organizationName: 'nmachine-io',
   trailingSlash: false,
 
   themeConfig: {
+
+    colorMode: {
+      defaultMode: 'dark',
+      disableSwitch: true,
+    },
+
     navbar: {
-      title: 'My Site',
+      title: 'MACHINE',
       logo: {
         alt: 'My Site Logo',
-        src: 'img/logo.svg',
+        src: 'https://uploads-ssl.webflow.com/60f53868cd59a339d865d5f7/60f53a4fb13e234185eb4c7f_57038906.png'
       },
       items: [
         {
@@ -83,7 +91,8 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
     },
     prism: {
-      theme: lightCodeTheme,
+      theme: darkCodeTheme,
+      // theme: lightCodeTheme,
       darkTheme: darkCodeTheme,
     },
   },
@@ -92,6 +101,9 @@ module.exports = {
       '@docusaurus/preset-classic',
       {
         docs: {
+
+          routeBasePath: '/',
+
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           editUrl:

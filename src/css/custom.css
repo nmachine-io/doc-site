@@ -24,6 +24,15 @@
   padding: 0 var(--ifm-pre-padding);
 }
 
+.navbar__logo{
+  height: 15px;
+  margin-right: 2px;
+}
+
+.navbar__title {
+  font-size: 19px;
+}
+
 html[data-theme='dark'] .docusaurus-highlight-code-line {
   background-color: rgba(0, 0, 0, 0.3);
 }
