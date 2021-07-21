@@ -1,32 +1,38 @@
+---
+sidebar_position: 0
+sidebar_label: Overview
+---
+
 # Models Overview
 
-Models are the fundamental building blocks of a `wiz`. Much like
-a Kubernetes resource, a Nectar model represents an entity,
-and exposes a customization API in the form of YAML.
+Models are the KAMA's fundamental building block. Much like
+a Kubernetes resource, a KAMA model represents some entity in the system;
+the developer declares instances of it via YAML.
  
-Practically speaking, models are a convenient way for publishers to customize the `wiz`'s behavior.
-Instead of letting publishers directly write the HTTP controllers 
-that ultimately provide Nectar's client-facing app with the necessary data,
-the `wiz` controllers handle boilerplate I/O work and delegate the real 
-work to relevant models.
+Everything you see in the user-facing platform comes models that 
+are being consumed and serialized. The following illustrates the relationship 
+between the `Operation` model and the interface served to the user:
 
- 
-As a publisher, the bulk of your `wiz` development work will be 
+<p align="center">
+    <img src='/img/models/operations/breakdown.png' width="80%" />
+</p>
+
+
+As the publisher, the bulk of your KAMA development work will be 
 writing models. This page describes the basic mechanics of models without 
 looking at one model in particular. 
 
 
-
 ## Anatomy of a Model 
 
-Every model in a `wiz` is a subclass of `WizModel` and has the four
+Every model in the KAMA is a subclass of the Python `Model` class and has the four
 following properties definable in YAML:
 
 ```yaml
-kind: SomeWizModelSubClassName
-id: string-unique-in-its-subclass
-title: Human Friendly Name If Displayed
-info: Human Friendly Description if Displayed
+kind: SomeModel
+id: identifier-for-me
+title: Title for end-user
+info: Description for end-user
 ```
 
 Beyond these four, different models will have different properties. 
