@@ -41,7 +41,7 @@ class AnnotateBananaPodAction(Action):
   	if banana_pod := KatPod.find("banana", config_man.ns()):
       old_sweetness = banana_pod.annotations.get("sweetness")
       new_sweetness = self.get_new_sweetness()
-      self.add_logs(["sweetness {old_sweetness} -> {new_sweetness}"])
+      self.add_logs([f"change {old_sweetness} to {new_sweetness}"])
       banana_pod.annotate({'sweetness': new_sweetness})
       return {'old_sweetness': old_sweetness, 'new_sweetness': new_sweetness}
     else:
@@ -105,7 +105,16 @@ To create the best user experience, and to modularize your KAMA code, you should
 up actions into sub-actions.
 
 The `MultiAction` class has a list of `Action`s it reads from its `sub_actions` attribute. It
-executes each action in sequence, halting if it gets a `FatalActionError` or any Python `Exception`.
+executes each action in sequence, halting if it gets a `FatalActionError` or any Python `Exception`. 
+
+```yaml title="MultiAction structure"
+kind: MultiAction
+title: "Make an omelette"
+sub_actions:
+  - kind::BreakTheEggs
+  - kind::ApplyHeat
+
+```
 
 **The maximum level of nesting is 3**. 
 
@@ -119,8 +128,8 @@ executes each action in sequence, halting if it gets a `FatalActionError` or any
 
 Notice that our `AnnotateBananaPodAction` returns something - 
 `{'old_sweetness': old_sweetness, 'new_sweetness': new_sweetness}`. When an action
-is part of a `MultiAction`, its return values will be made available to actions
-that follow it via attribute patching.
+is part of a `MultiAction`, its return values will be made available to subsequent actions 
+it via attribute patching.
 
 ```python
 from kama_sdk.model.action.base.action import Action

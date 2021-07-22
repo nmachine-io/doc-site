@@ -4,7 +4,7 @@ sidebar_label: Overview
 sidebar_position: 0
 ---
 
-A `Predicate` is used produce a `True/False` value from some computation. 
+A `Predicate` is a special `Supplier` that can only resolve to `True/False`. 
 Most predicates work by comparing two values: `challenge` and `check_against`. 
 A simple predicate check to whether `5` is more than `4` in
 YAML would be:
@@ -40,7 +40,7 @@ check_against 1
 # True now but False if challenge/check_against swapped values
 ``` 
 
-Any `Predicate` or its subclass can perform the follwoing:
+Any `Predicate` or its subclass can perform the following:
 
 | `operator` (aliases) | `challenge`    | `predicate`    | True if                                                         |
 |----------------------|----------------|----------------|-----------------------------------------------------------------|
@@ -106,9 +106,9 @@ import json
 from kama_sdk.model.supplier.predicate.predicate import Predicate
 
 class JsonChallengePredicate(Predicate):
-  def challenge() -> List:
+  def challenge() -> Dict:
     raw = super(JsonChallengePredicate, self).check_against()
-    retunr json.loads(raw)
+    return json.loads(raw)
 ```
 
 

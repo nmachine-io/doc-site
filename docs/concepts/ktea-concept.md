@@ -29,6 +29,12 @@ Helm's popularity, it's not for everybody; moreover individual preference around
 templating engines should be a bottleneck to portability. Finally, with HTTP-based
 templating, the end-user does not need to own the templating software, which is good.
 
+
+## Where KTEAs Fit In
+
+The KTEA is at the heart of an NMachine. When a user 
+
+
 ## KTEAs in Practice
 
 When the NMachine client installs an application, it writes a `ktea` entry in the 

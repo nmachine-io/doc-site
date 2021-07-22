@@ -4,13 +4,13 @@ sidebar_label: Deployment
 
 # Deployment: Where do things Run?
 
-Users - that is, people managing your application using the KAMA you built for NMachine - 
-can end up running NMachine **one of six ways**. This depends on two things:
-- Where the **[KAMA](/concepts/kama-concept.md)** is being hosted
-- Where the **client application** is running
+If a user installs an app with NMachine, where is everything running?
+
+- **The application itself** is running directly on the user's cluster.
+- **The NMachine client** can be a desktop app on the user's computer, or a web app in the cloud
+- **The [KAMA](/concepts/kama-concept) server** can be in the user's cluster or in the cloud
+- **The [KTEA](/concepts/ktea-concept) server(s)** can run in the user's cluster, or in the cloud 
+(server<u>**s**</u> because of [plugins](/concepts/plugins-concept.md))
 
 
-## Options for hosting the KAMA
-
-
-## Options for running the Client Application
+## Pros and Cons of different setups
