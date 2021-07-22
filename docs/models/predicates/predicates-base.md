@@ -50,7 +50,7 @@ Any `Predicate` or its subclass can perform the follwoing:
 | `gte` (`>=`)             | Number         | Number         | `3 >= 2`, `3.0 >= "3"`                                          |
 | `less-than` (`<`)        | Number         | Number         | self explanatory                                                |
 | `lte` (`<=`)             | Number         | Number         | self explanatory                                                |
-| `falsy` (`falsiness`)    | Any            | N/A            | `False`, `"false"`, empty strings/sets/dicts                    |
+| `falsy` (`falsiness`, `nullish`)    | Any            | N/A            | `False`, `"false"`, `"null"`, empty strings/sets/dicts                    |
 | `truthy` (`truthiness`)  | Any            | N/A            | Opposite of `falsy`                                             |
 | is-in (`in`)           | Scalar         | List or string | `2 in [1, 2]` and `"i" in "hi"`                                 |
 | `contains`             | List or string | Scalar         | `in` operator with `challenge` and `check_against` swapped      |
@@ -58,10 +58,10 @@ Any `Predicate` or its subclass can perform the follwoing:
 
 ### Dealing with Lists
 
-If the `challenge` is a list, the Predicate will behave according to the `on_many` attribute
+If the `challenge` is a list, the Predicate will behave according to the `many_policy` attribute
 supplied. Explained by example:
 
-| `on_many`    | `operator` example | `challenge` example | `check_against` example | Result |
+| `many_policy`    | `operator` example | `challenge` example | `check_against` example | Result |
 |--------------|--------------------|---------------------|-------------------------|--------|
 | `each_true`  | `greater-than`     | [1, 2, 3]           | 0                       | True   |
 | `each_false` | `greater-than`     | [1, 2, 3]           | 2                       | False  |
@@ -123,9 +123,6 @@ Right hand operand in any binary comparison (see [Operatorss](#operators))
 #### `operator` | default: `"equals"`
 Binary or unary operator to be used to on `challenge` and/or `check_against (see [Operatorss](#operators)). 
 
-#### `reason` | default: `None`
-
-Text to be displayed to the user if this predicate is user-facing.
 
 #### `negate` | default: `False`
 Flip the original boolean result of the computation. The following would return True:
@@ -146,3 +143,10 @@ early_true_if: get::id::another-predicate
 
 #### `early_false_if`
 Self explanatory.
+
+
+#### `reason` | default: `None`
+Text to be displayed to the user if this predicate is user-facing.
+
+#### `tone` | default: `error`
+Signals to the user whether or not a negative result is "fatal" or not.

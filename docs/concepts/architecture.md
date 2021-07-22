@@ -1,8 +1,5 @@
 
-# Key Concepts for Publishers
-
-
-## Architecture
+# Architecture
 
 Nectar follows a losely coupled architecture; applications 
 run _with_ it rather than _on_ it, in the sense that Nectar does 
