@@ -30,6 +30,9 @@ templating engines should be a bottleneck to portability. Finally, with HTTP-bas
 templating, the end-user does not need to own the templating software, which is good.
 
 
+## Where KTEA Servers Run
+
+
 ## Where KTEAs Fit In
 
 The KTEA is at the heart of an NMachine. When a user 

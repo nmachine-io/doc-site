@@ -8,24 +8,103 @@ sidebar_label: Overview
 ## What is NMachine?
 
 **For a quick and dirty understanding**, think of NMachine as the intersection of:
-- A Helm wrapper
+- A Helm & Puppet wrapper
 - A Platform as Code SDK
 - A Kubernetes App-store
-- An application-specifig Heroku / Internal Dev Platform
+- An application-specific Heroku and Internal Dev Platform
 
-**Or in wordier terms**, NMachine gives you an SDK to build an application-specific platform 
+**In wordier terms**, NMachine gives software publishers an SDK to build an application-specific platform 
 for a Kubernetes application, where operational knowledge is digitized,
 so that unfamiliar users may install/operate/troubleshoot/update 
 said application with confidence at the production-level on their own infrastructure. Publishers can 
 then leverage rich distribution features from our cloud-based dashboard, such as
-telemetry access, release channels, payments/licenses, and rule-based last-minute configuration.
+telemetry access, release channels, payments/licenses, and rule-based last-mile configurations.
 
-## Digitizing Operational Knowlege
 
-What, specifically, can a publisher instruct their platform to do?
+## What is _an_ NMachine?
 
+Anytime we refer to **_<u>an</u>_** NMachine, we mean a running instance 
+of the application-specific platform. That is why the client web app for 
+end-users lives at [an.nmachine.io](https://an.nmachine.io).
+Similar to VMs being VMWare instances.
+
+## Digitizing Operational Knowledge
+
+What can a publisher program their NMachine to 
+do that makes life better for unfamiliar users who need to run their application? 
+The best way to build an intuition for this is to watch the
+ demo [Youtube video](https://www.youtube.com/watch?v=p7dqmROKGIo).  
+
+### 1. Confidence through Health Checks
+
+Operators build confidence about the state of an application
+with liveness probes and tools ([Polaris](https://github.com/FairwindsOps/polaris), etc..), 
+**but what really matters** is _how well they know_ the app. NMachine tackles this
+by making it excessively easy for the publisher to proliferate health checks throughout their platform: 
+global checks, resource and variable-specific checks, preflight checks, etc...
+
+### 2. Manifest Variable Management 
+
+Manifest variables are effectively the control knobs for modern chart-based 
+Kubernetes applications and are therefore critical to set right. 
+The KAMA SDK lets publishers associate their app's manifest variables with validations, 
+dependency analysis, health checks, backups, and rich metadata.
+
+### 3. Controlled Operations
+
+In practice, operating a Kubernetes app requires 
+operator to do more than `helm upgrade`: they often must CRUD resources, 
+run shell commands, test things manually, etc... 
+NMachines have a unified Action/Operation system that lets publishers create 
+rich, contextual, interactive actions that users can execute with confidence.
+
+### 4. Troubleshooting
+
+Prior knowledge is obviously instrumental in fixing problems. A Kubernetes developer
+is often aware of bad states the system can end up in; the question then becomes doing
+the right diagnosis and not botching the remediation. That's why NMachine
+lets the publisher create remediation options for failed health checks or actions.
+
+### 5. Logical Organization
+
+In an application with 50+ Kubernetes resources, it can be difficult for an unfamilar 
+operator to know what to focus on. NMachine gives publishers complete freedom to define
+dashboards with any kind of data (Kubernetes or not) that makes the most sense for their 
+unique application.
+ 
 
 ## Components
 
 ![](/img/concepts/overview-system.jpg)
 
+### NMachine Client
+
+This is what the end-user (i.e the application operator) sees. It is the dashboard
+that lets end-users install/operate apps provided by publishers. One client can 
+show multiple NMachines (e.g apps) across multiple Kubernetes clusters. 
+For a given NMachine, the client client populates its UI by making calls to the 
+corresponding [KAMA server](#kama-server).
+
+### KAMA Server
+
+Make sure to read the dedicated [KAMA Page](/concepts/kama-concept.md). In a word, the KAMA
+Server is the API that serves the logic that the publisher wrote to 
+[digitize operational knowledge](#digitizing-operational-knowledge) of their system. The 
+KAMA also talks extensively to the user's Kubernetes cluster.    
+
+### KTEA Server
+
+Make sure to read the dedicated [KTEA Page](/concepts/ktea-concept.md). A KTEA server
+basically just serves a manifest templating tool (like Helm) over HTTP with JSON. The
+KAMA talks to it whenever it needs to generate a new manifest, e.g because a variable has changed.
+
+### User Kubernetes Cluster
+
+The cluster where the user wants the publisher's application to run. NMachine is entirely
+agnostic to the cluster's properties. Compatibility issues are the publisher's responsibility
+to using preflight-checks at installation time.
+
+### NMachine Cloud API
+
+The API at `api.nmachine.io` does two things: 1) give metadata about individual NMachines,
+and 2) injest telemetry created by the KAMA. NMachines can be made to run air-gapped.
