@@ -1,15 +1,14 @@
 ---
-sidebar_position: 1
+sidebar_position: 2
 sidebar_label: KTEA
 ---
 
 # Kubernetes Templating Engine API (KTEA)
 
-Helm and Kustomize are examples of popular templating engines for Kubernetes manifests. 
 NMachine makes two fundamental assumptions about modern Kubernetes apps:
 
-1. Their final manifests come from templating engines (as opposed to being static)
-2. Templating engines output YAML based on user-defined variables consumed at runtime
+1. Their final manifests come from templating engines like Helm (as opposed to being static)
+2. Templating engines output YAML based on user-defined variables passed at invokation time
 
 
 ## KTEA is a Simple Templating Protocol
@@ -23,38 +22,115 @@ it would look like this:
 - **Get default values**: `GET /values`
     - **Output**: YAML/JSON dictionary of all default values (e.g `values.yaml`)
 
-That is all a KTEA is - an HTTP API protocol. Despite being simple, this protocol
+That is all a KTEA is - a protocol for HTTP-based API. The protocol's simplicity
 gives NMachine the flexibility to **support any templating engine**. Despite
-Helm's popularity, it's not for everybody; moreover individual preference around
+Helm's popularity, it's not for everybody; moreover, individual preference around
 templating engines should be a bottleneck to portability. Finally, with HTTP-based
 templating, the end-user does not need to own the templating software, which is good.
 
+## Creating your KTEA Servers
+
+If you're coming from Helm, you can make a KTEA server for your chart in 30 seconds by 
+following the [Helm to KTEA Tutorial](/tutorials/helm-to-ktea-tutorial.md). 
+If you're using another templating engine, follow the 
+[Any to KTEA Tutorial](/tutorials/creating-a-ktea-tutorial.md).
 
 ## Where KTEA Servers Run
 
+Once you have a KTEA server, it needs to be available for your KAMA to consume. There
+are four (three in production) ways to make a KTEA available to your KAMA. As a publisher,
+you will be asked to choose when creating an application in the 
+[Publisher Dashboard](https://publisher.nmachine.io) as per the image below. Note that you
+can **support multiple methods** and let each end-user choose their preferred method.
 
-## Where KTEAs Fit In
+![](/img/concepts/choose-ktea-type.png)
 
-The KTEA is at the heart of an NMachine. When a user 
+### Option 1: Managed on NMachine
+
+If you Dockerize and `push` your KTEA server to an artifact repo on the web, you can point
+[publish.nmachine.io](https://publish.nmachine.io). It will then host it at
+`api.nmachine.io/ktea/$org/$ktea_id`. The benefit of this option 
+(beyond "serverless"-ness) is that you can set access control rules
+e.g "deny access to anybody with an expired license". You can also easily monitor
+the server's health in the Publisher Dashboard UI:
+
+![](/img/concepts/ktea-pub-dashboard.png)
+
+### Option 2: Generic endpoint on the web
+
+You are free to self-host your KTEA it anywhere on the web.
+While conceptually the simplest option, it lacks contextual authentication/authorization 
+logic you may need in production, e.g to deny access to KAMAs with expired licenses.  
+
+### Option 3: In-Cluster Server
+
+Assuming again that your KTEA server can run as a Docker image, you can make it so that 
+the NMachine client creates a special workload in your user's cluster that runs that image. 
+If your end users are running your app air-gappped, you'll want to support this strategy.    
+
+### Development-Only: Local Executable 
+
+Finally, during development, if you have KTEA that you can invoke via the command line,
+you can simply choose that as you develop locally. 
+Read more [here](#special-case-local-executable-kteas).
 
 
-## KTEAs in Practice
+## How KAMAs interact with KTEAs
+
+As a publisher building on top the of the KAMA SDK, the high level [Models API](/models/models-overview.md) 
+gives you many convenient ways to talk use the KTEAs. If, however, you want to build 
+a deeper understanding of the KTEA <-> KAMA mechanism, keep reading.
+
+### Definition
 
 When the NMachine client installs an application, it writes a `ktea` entry in the 
 master `ConfigMap` (see [Concepts](/concepts/master-configmap.md)) with three key-value assignments:
 
 | Key       | Type                                               | Note                                                                                                                                                                                                                                                         |
 |-----------|----------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `type`    | `server` \| `managed_server` \| `local_executable` | <ul> <li>`server`: hit the endpoint given by `uri` as-is</li> <li>`managed_server`: special contextual request to `api.nmachine.com`, ignore `uri`</li> <li>`local_executable`: assume `uri` is a script name; execute in shell, result := STDOUT</li> </ul> |
+| `type`    | `server` \| `in_cluster` \| `local_executable` | <ul> <li>`server`: hit the endpoint given by `uri` as-is</li> <li>`managed_server`: special contextual request to `api.nmachine.com`, ignore `uri`</li> <li>`local_executable`: assume `uri` is a script name; execute in shell, result := STDOUT</li> </ul> |
 | `uri`     | string or nil                                      | URL or path depending on `type`, e.g or `https://foo.bar/my-ktea`  `~/workspace/my-script.sh`                                                                                                                                                               |
 | `version` | string                                             | semantic version format e.g "1.93.4"                                                                                                                                                                                                                         |
 
-**In Production**, the client populates the `ktea` entry by reading the application definition
-that you - the publisher - provided in the [Publisher Dashboard](https://www.publish.nmachine.io). 
-Note that `type=local_executable` is <u>not available in production</u>.
+Note that this data structure is type in the KAMA SDK called **KteaDict**.
 
-**In development**, the the values are read from the Application Setup wizard 
-you - the publisher - go through.
+### Invokation
+
+The KAMA SDK ships with an abstract class called `KteaClient`. Depending on the type 
+of the KTEA being invoked, the relevant `KteaClient` subclass will be instantiated
+to do the actual invokation. This snippet from the base class makes this mechanism 
+clear: 
+
+```python title="kama_sdk.core.ktea.ktea_client"
+class KteaClient:
+
+  ktea_dict: KteaDict
+  config_space: str
+
+  def __init__(self, ktea_dict: KteaDict, config_space: str):
+    self.ktea = ktea_dict
+    self.config_space = config_space
+
+  def load_default_values(self) -> Optional[Dict]:
+    raise NotImplemented
+
+  def load_preset(self, name: str) -> Optional[Dict]:
+    raise NotImplemented
+
+  def template_manifest(self, values: Dict) -> List[K8sResDict]:
+    raise NotImplemented
+```
+
+As you might expect, these subclasses are `HttpKteaClient`, `InClusterHttpKteaClient`, and 
+`LocalExecutableKteaClient`.
+
+## Selection
+
+How is the correct `KteaClient` subclass selected?
 
 
-# Accessing the KTEA in the SDK
+# Special KTEAs
+
+## Locally Executable KTEAs
+
+## Virtual KTEAs 

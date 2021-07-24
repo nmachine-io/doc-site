@@ -9,7 +9,7 @@ Models are the KAMA's fundamental building block. Much like
 a Kubernetes resource, a KAMA model represents some entity in the system;
 the developer declares instances of it via YAML.
  
-Everything you see in the user-facing platform comes models that 
+Everything users see in the platform comes models that 
 are being consumed and serialized. The following illustrates the relationship 
 between the `Operation` model and the interface served to the user:
 

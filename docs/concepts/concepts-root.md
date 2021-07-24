@@ -7,11 +7,11 @@ sidebar_label: Overview
 
 ## What is NMachine?
 
-**For a quick and dirty understanding**, think of NMachine as the intersection of:
+As a quick and dirty mental placeholder, you can think of NMachine as the intersection of:
 - A Helm & Puppet wrapper
 - A Platform as Code SDK
 - A Kubernetes App-store
-- An application-specific Heroku and Internal Dev Platform
+- An application-specific Heroku
 
 **In wordier terms**, NMachine gives software publishers an SDK to build an application-specific platform 
 for a Kubernetes application, where operational knowledge is digitized,
@@ -26,7 +26,7 @@ telemetry access, release channels, payments/licenses, and rule-based last-mile 
 Anytime we refer to **_<u>an</u>_** NMachine, we mean a running instance 
 of the application-specific platform. That is why the client web app for 
 end-users lives at [an.nmachine.io](https://an.nmachine.io).
-Similar to VMs being VMWare instances.
+Akin to VMs being VMWare instances.
 
 ## Digitizing Operational Knowledge
 
@@ -52,7 +52,7 @@ dependency analysis, health checks, backups, and rich metadata.
 
 ### 3. Controlled Operations
 
-In practice, operating a Kubernetes app requires 
+In practice, operating a Kubernetes app requires the 
 operator to do more than `helm upgrade`: they often must CRUD resources, 
 run shell commands, test things manually, etc... 
 NMachines have a unified Action/Operation system that lets publishers create 
@@ -60,8 +60,8 @@ rich, contextual, interactive actions that users can execute with confidence.
 
 ### 4. Troubleshooting
 
-Prior knowledge is obviously instrumental in fixing problems. A Kubernetes developer
-is often aware of bad states the system can end up in; the question then becomes doing
+Prior knowledge is obviously instrumental to fixing problems. A Kubernetes developer
+is often aware of the bad states the system can end up in; it's then a question of doing
 the right diagnosis and not botching the remediation. That's why NMachine
 lets the publisher create remediation options for failed health checks or actions.
 
@@ -102,7 +102,7 @@ KAMA talks to it whenever it needs to generate a new manifest, e.g because a var
 
 The cluster where the user wants the publisher's application to run. NMachine is entirely
 agnostic to the cluster's properties. Compatibility issues are the publisher's responsibility
-to using preflight-checks at installation time.
+to flag using preflight-checks at installation time.
 
 ### NMachine Cloud API
 

@@ -1,13 +1,25 @@
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+---
+sidebar_position: 0
+sidebar_label: "Getting Started"
+---
 
-# Getting Started For Publishers
+# Getting Started
 
-This guides takes us through building a simple platform around a simple Kubernetes application, 
-publishing it, and pushing updates. **Pre-requisites**:
-1. Access to a Kubernetes Cluster with a valid `context`
-1. Python3 installed (and ideally  `pipenv`)
-1. An understanding of the [Key concepts](/)
+## Synopsis
+
+**Objective**. Build a simple NMachine, learn the basics of the KAMA SDK along the way.
+
+**Requirements**. A Kubernetes Cluster and Python3.
+
+
+## Step 1: Create the project
+
+Create a directory 
+
+
+## Step 2: Install the Client
+
+
 
 
 ### 1. Install the desktop client

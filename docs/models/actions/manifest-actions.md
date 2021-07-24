@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-sidebar_label: Variables Actions
+sidebar_label: Manifest Actions
 ---
 
 # Variables Actions
@@ -9,6 +9,33 @@ The KAMA SDK ships with several actions pre-built actions related
 to manifest variables manipulation.
 
 ## Atomic Actions
+
+### TemplateManifestAction
+
+Invoke a KTEA's `POST /template` given a bundle of variable assignments
+and return the result.
+
+```python
+action = TemplateManifestAction.inflate({
+  'values': {'frontend.service.type': 'NodePort'}
+})
+
+result = action.run()
+print(f"new manifest {result['res_descs']}")
+```
+
+
+| Key         | Type                                                               | Notes                                                                     |
+|-------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|
+| `values`    | `Dict` **required**                                                | variable assignments bundle to be passed to the KTEA                      |
+| `selectors` | `List[ResourceSelector]`                                           | if non-empty, acts as a whitelist to filter resources yielded by the KTEA |
+| `ktea`      | [`KteaDict`](/concepts/ktea-concept#how-kamas-interact-with-kteas) | if non-empty, forces action to use this KTEA                              |
+
+
+**Return Value**: `{'res_descs': X}` where X is a `List[Dict]`, 
+e.g the resource descriptors returned by the KTEA. 
+
+
 
 ### PatchManifestVarsAction
 
