@@ -107,6 +107,7 @@ module.exports = {
       {
         docs: {
           routeBasePath: '/',
+          remarkPlugins: [ require('remark-import-partial')],
           sidebarPath: require.resolve('./sidebars.js')
         },
         blog: {},

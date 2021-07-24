@@ -86,11 +86,8 @@ a deeper understanding of the KTEA <-> KAMA mechanism, keep reading.
 When the NMachine client installs an application, it writes a `ktea` entry in the 
 master `ConfigMap` (see [Concepts](/concepts/master-configmap.md)) with three key-value assignments:
 
-| Key       | Type                                               | Note                                                                                                                                                                                                                                                         |
-|-----------|----------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `type`    | `server` \| `in_cluster` \| `local_executable` | <ul> <li>`server`: hit the endpoint given by `uri` as-is</li> <li>`managed_server`: special contextual request to `api.nmachine.com`, ignore `uri`</li> <li>`local_executable`: assume `uri` is a script name; execute in shell, result := STDOUT</li> </ul> |
-| `uri`     | string or nil                                      | URL or path depending on `type`, e.g or `https://foo.bar/my-ktea`  `~/workspace/my-script.sh`                                                                                                                                                               |
-| `version` | string                                             | semantic version format e.g "1.93.4"                                                                                                                                                                                                                         |
+{@import ./../../partials/ktea-dict.md}
+
 
 Note that this data structure is type in the KAMA SDK called **KteaDict**.
 
