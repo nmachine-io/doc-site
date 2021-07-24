@@ -18,14 +18,13 @@ for a Kubernetes application, where operational knowledge is digitized,
 so that unfamiliar users may install/operate/troubleshoot/update 
 said application with confidence at the production-level on their own infrastructure. Publishers can 
 then leverage rich distribution features from our cloud-based dashboard, such as
-telemetry access, release channels, payments/licenses, and rule-based last-mile configurations.
+telemetry access, release channels, payments/licenses, and rule-based last-mile configurations. 
 
 
 ## What is _an_ NMachine?
 
 Anytime we refer to **_<u>an</u>_** NMachine, we mean a running instance 
-of the application-specific platform. That is why the client web app for 
-end-users lives at [an.nmachine.io](https://an.nmachine.io).
+of the application-specific platform. This the _an_ in [an.nmachine.io](https://an.nmachine.io).
 Akin to VMs being VMWare instances.
 
 ## Digitizing Operational Knowledge
@@ -39,8 +38,8 @@ The best way to build an intuition for this is to watch the
 
 Operators build confidence about the state of an application
 with liveness probes and tools ([Polaris](https://github.com/FairwindsOps/polaris), etc..), 
-**but what really matters** is _how well they know_ the app. NMachine tackles this
-by making it excessively easy for the publisher to proliferate health checks throughout their platform: 
+**but what really matters** is _how well they know_ the app. NMachine makes it 
+excessively easy for publishers to proliferate health checks throughout their platforms: 
 global checks, resource and variable-specific checks, preflight checks, etc...
 
 ### 2. Manifest Variable Management 

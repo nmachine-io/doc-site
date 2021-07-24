@@ -5,7 +5,7 @@ sidebar_label: KAMA
 
 # Kubernetes Application Management API (KAMA)
 
-The KAMA is the heart of NMachine. Recall that NMachine lets publishers
+The KAMA is at the heart of NMachine. Recall that NMachine lets publishers
 **[digitize operational knowledge](/concepts/concepts-root#digitizing-operational-knowledge)**;
 the KAMA is where that happens. A KAMA is an HTTP-based API that is implements
 the functionality needed to power an NMachine, namely talking to the Kubernetes
@@ -20,12 +20,12 @@ your KAMA as part of your application definition. How and where your KAMA actual
 is explained [here](#where-kama-servers-run). Building a KAMA with the SDK is the object
 of most of this site.
 
-Two points on terminology we use in this documents:
-- **"KAMA"**. Depending on the context, "KAMA" may mean either a) a running instance
+Two points on the terminology we use going forward:
+- **"KAMA"**. Depending on the context, may be either a) a running instance
 of a KAMA server, or b) the code you build on the Python KAMA SDK.
-- **"Publisher"**: Depending on the context, the "Publisher" may either be to a) 
-company that distributes apps with NMachine, or b) a developer of that company 
-who develops a KAMA using the SDK.
+- **"Publisher"**: Depending on the context, may be either a) 
+the company that distributes apps with NMachine, or b) the developer(s) in that company 
+who develop a KAMA using the SDK.
 
 Zooming into the KAMA: 
 
@@ -34,22 +34,31 @@ Zooming into the KAMA:
 ## Internal Structure
 
 As shown above, the KAMA has three main parts. The sections below only give a brief introduction;
-dedicated pages that go in greater depth are available for each one.
+dedicated pages are available for each one.
 
 ### HTTP API
 
-The NMachine client consumes the KAMA over HTTP. As such, the KAMA's first important function
-the KAMA is processing HTTP/JSON requests. As publisher, you probably won't need to know 
+The NMachine client consumes the KAMA over HTTP/JSON. As such, the KAMA's first important function
+is processing HTTP/JSON requests. As publisher, you won't likely need to know 
 how the API's controllers, serializers, or routes work; instead you will focus on writing 
-[models](#models). Find comprehensive documentation in [API Spec](#nope.md).
+[models](#models). Find comprehensive documentation in the [API Spec](/nope).
+
 
 ### Models
 
+As a publisher building your KAMA, most of your focus will be Models. These are the logical
+entities that make up an NMachine, like a `ManifestVariable` or a 
+[`RunKubectlApplyAction`](/models/actions/kubernetes-actions#kubectlapplyaction). 
+As a publisher, your unique NMachine is defined by the Models you define. Find 
+ comprehensive documentation starting in the [Models Overview](/models/models-overview.md).
 
 
 ### Core Modules 
 
- 
+Behind the Models lie the Core Modules. These are simply a collection of Python modules.
+They do much of the actual work delegated out by Models. As a publisher, you will only
+need to think about Core Modules when you create custom `Model` subclasses.
+Find comprehensive documentation in the [API Spec](/nope). 
 
 
 

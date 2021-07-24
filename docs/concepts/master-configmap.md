@@ -4,8 +4,8 @@ sidebar_label: State
 
 # State: the Master ConfigMap
 
-When the NMachine client installs an application for a user, 
-it will begin by creating a `ConfigMap` called `master` in the application's
+When the NMachine client installs an application for a user (e.g creates _an_ NMachine), 
+it begins by creating a `ConfigMap` called `master` in the application's
 namespace. This is where the application's identity and state are stored. 
 
 ## Format
