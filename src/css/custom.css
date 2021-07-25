@@ -36,11 +36,14 @@
   font-size: 19px;
 }
 
+blockquote {
+  border-color: #9CDCFE;
+}
+
 html[data-theme='dark'] .docusaurus-highlight-code-line {
   background-color: rgba(0, 0, 0, 0.3);
 }
 
 html[data-theme='dark'] {
-
   --ifm-background-color: #2a2b2a;
 }
