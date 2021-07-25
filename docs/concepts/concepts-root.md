@@ -86,16 +86,16 @@ corresponding [KAMA server](#kama-server).
 
 ### KAMA Server
 
-Make sure to read the dedicated [KAMA Page](/concepts/kama-concept.md). In a word, the KAMA
-Server is the API that serves the logic that the publisher wrote to 
-[digitize operational knowledge](#digitizing-operational-knowledge) of their system. The 
-KAMA also talks extensively to the user's Kubernetes cluster.    
+In a word, the KAMA Server is the API that serves the logic that the publisher wrote to 
+[digitize operational knowledge](#digitizing-operational-knowledge) of their system. It is 
+the most important component.
+Read the full [KAMA Page](/concepts/kama-concept.md)
 
 ### KTEA Server
 
-Make sure to read the dedicated [KTEA Page](/concepts/ktea-concept.md). A KTEA server
-basically just serves a manifest templating tool (like Helm) over HTTP with JSON. The
+A KTEA server essentially serves a manifest templating tool (like Helm) over HTTP/JSON. The
 KAMA talks to it whenever it needs to generate a new manifest, e.g because a variable has changed.
+Read the full [KTEA Page](/concepts/ktea-concept.md)
 
 ### User Kubernetes Cluster
 

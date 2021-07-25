@@ -84,10 +84,9 @@ a deeper understanding of the KTEA <-> KAMA mechanism, keep reading.
 ### Definition
 
 When the NMachine client installs an application, it writes a `ktea` entry in the 
-master `ConfigMap` (see [Concepts](/concepts/master-configmap.md)) with three key-value assignments:
+master `ConfigMap` (see [Concepts](/concepts/state-concept.md)) with three key-value assignments:
 
 {@import ./../../partials/ktea-dict.md}
-
 
 Note that this data structure is type in the KAMA SDK called **KteaDict**.
 
@@ -123,7 +122,7 @@ As you might expect, these subclasses are `HttpKteaClient`, `InClusterHttpKteaCl
 
 ## Selection
 
-How is the correct `KteaClient` subclass selected?
+How is the correct `KteaClient` subclass selected? 
 
 
 # Special KTEAs
