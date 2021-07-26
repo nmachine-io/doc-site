@@ -4,10 +4,10 @@ sidebar_label: Overview
 sidebar_position: 0
 ---
 
-A `Predicate` is a special `Supplier` that can only resolve to `True/False`. 
-Most predicates work by comparing two values: `challenge` and `check_against`. 
-A simple predicate check to whether `5` is more than `4` in
-YAML would be:
+A `Predicate` is a special [`Supplier`](/models/suppliers/supplier-overview) 
+that can only resolve to `True/False`. Most predicates work by comparing 
+two values: `challenge` and `check_against`. A simple predicate check 
+to whether `5` is more than `4` in YAML would be:
 
 ```yaml
 kind: Predicate

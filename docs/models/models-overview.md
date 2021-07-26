@@ -282,11 +282,7 @@ available as an attribute so that it can be used as follows:
 ```yaml
 kind: BestSiteEndpointSupplier
 id: "my-supplier"
-site_access_nodes:
-  - kind: SimpleIngressSiteAccessNode
-    ingress_selector: 
-      kind: ResourcesSelector
-  - #...an so on
+site_access_nodes: #...more yaml
 
 ---
 
