@@ -246,8 +246,8 @@ validators:
     operator: "truthiness"
     challenge: "get::self>>inputs->.prometheus.url"
 ```
-
-Cases when the SDK patches models at inflation time will always be documented.
+The `->.` syntax is explained later. Cases when the SDK patches models at 
+inflation time will always be documented.
 
 ### Supplier Values with `get::`
 
@@ -274,13 +274,68 @@ default_value: "get::id::my-supplier"
 
 ### Helper Values with `get::&`
 
+A `Supplier` can act as a helper by making its instance methods accessible
+as attributes as is explained in the [Supplier Overview](/model/suppliers/supplier-overview).
+For example, the `BestSiteEndpointSupplier` makes `as_url` 
+available as an attribute so that it can be used as follows:
 
+```yaml
+kind: BestSiteEndpointSupplier
+id: "my-supplier"
+site_access_nodes:
+  - kind: SimpleIngressSiteAccessNode
+    ingress_selector: 
+      kind: ResourcesSelector
+  - #...an so on
+
+---
+
+kind: ConcernCardAdapter
+spec:
+  type: Section
+  elements:
+   - type: "Text"
+     text: "get::&id::my-supplier>>as_url"
+
+```
 
 ### Templated Strings with `${}`
 
+The techniques above can be used in conjunction with the special `${}` 
+syntax for strings:
+
+```yaml
+kind: Predicate
+id: templating-demo
+challenge: "foo"
+check_against: "bar" 
+title: "${get::self>>challenge} VS ${get::self>>check_against}"
+```
+
+We would get:
+
+```python
+print(Model.inflate("templating-demo").get_title())
+# => foo VS bar
+```
+
 ### List Splattering with `...`
 
+You will sometimes want to add to a list provided by a `Supplier`. You can
+do this with the `...` syntax:
 
+```yaml
+kind: Supplier
+id: "my-supplier"
+source: ["apple", "banana"]
+
+---
+
+kind: FruitBowl
+contents:
+  - "...get::my-supplier"
+  - cherry
+```
 
 
 
