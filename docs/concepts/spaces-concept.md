@@ -17,12 +17,12 @@ to the `space` system.
 
 ## The `space` attribute
 
-Every Model instance in NMachine has a `space` tag.
+Every Model instance in NMachine has a `space` attribute.
 If the model comes from the 
 main application, **its `space` should be `"app"`**, otherwise, it will
 be the plugin's self-declared ID, e.g `"foo-org.bar-plugin"`. 
 
-### Set the Space Once
+### Default `space: app` Behavior 
 
 When writing out your models in YAML, you don't have to set `space: app` 
 manually for every model. As long as you do the following on startup,
@@ -43,6 +43,8 @@ in your descriptor's YAML.
 
 By default, the value of a `space` attribute has no effect on the KAMA's behavior; 
 it is primarily used to inform the user where a particular resource is coming from; see image below.
+
+![](/img/concepts/many-spaces.png)
 
 You can, however, use `space` when querying models. Below, 
 we want to give `foo` and `bar` as  `sub_actions` our `MultiAction`, but only 

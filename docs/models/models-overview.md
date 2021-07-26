@@ -6,8 +6,8 @@ sidebar_label: Overview
 # Models Overview
 
 Models the are the entities that make up the KAMA's world view. The SDK provides
-a multitude of models, which you, as a publisher, instantiate 
-using YAML or Python, giving your NMachine its behavior. Models are conceptually similar 
+a multitude of models, which you, as a publisher, create instances of 
+using YAML or Python, giving your NMachine its behavior. Models are conceptually quite similar 
 to Resources in Kubernetes. 
 
 Example that shows the mapping between models and final output:
@@ -35,64 +35,110 @@ print(f"Inflated from {predicate.config}")
 ```
 
 Without going into detail, the `Predicate` class **will expect certain key-value pairs** 
-to be present, read them, and use them in computations. The descriptor can be 
+to be present so it can read them for computations. The descriptor can be 
 gotten by calling `config` property on a Model instance.
 
-
-## Registering your Model Descriptors 
-
-You need to pass all your descriptors to
-the `models_man` during your NMachine's startup sequence:  
-
-```python title=main.py
-from kama_sdk.model.base.model import models_man
-
-my_descriptors = [{'kind': 'Predicate'}]
-models_man.add_descriptors(my_descriptors)
-```  
-
-In real life, you'll probably want to use YAML. If you used the recommended directory 
-structure for your project and your YAMLs are all in `<project>/models`, you can 
-use the handy `utils.yamls_in_dir` function to convert all your YAML descriptors
-to dicts:
-
-```python title=main.py
-import os
-from kama_sdk.core.core import utils
-from kama_sdk.model.base.model import models_man
-
-root_dir = os.path.dirname(os.path.abspath(__file__))
-dicts = utils.yamls_in_dir(f'{root_dir}/models', recursive=True)
-models_man.add_descriptors(dicts)
-```  
-
-You can of course use any mixture of both YAML and Dicts. In fact, as your 
-code grows, you'll likely want to generate descriptors programmatically.
-
-Everything given to the `models_man` will be in memory for server's
-lifetime. Because NMachines have multiple processes, you cannot add descriptors after startup. 
+In practice, you'll probably write your descriptors in YAML as explained in the 
+[Registering YAML Model Descriptors](/tutorials/registering-model-descriptors) tutorial.
 
 
-## Base Attributes
+## Universal Attributes
 
-Every model understands the following attributes.
+`Model`, and therefore all of its subclasses, can read the following attributes from its descriptor: 
+Depending on the context,
+ 
+{@import ./../../partials/common-model-attrs.md}
 
-| Key            | Info                                                                                                                                                       |   |
-|----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|---|
-| `kind`         | name of the `Model` subclass that should load this descriptor                                                                                              |   |
-| `id`           | id that other models can use to refer to this instance. should be unique within the `kind`. if duplicates are found, the last one defined takes precedence |   |
-| `space`        | name of the space responsible for this model. `app` if the main KAMA or id of plugin, explained [here](/concepts/spaces-concept)                           |   |
-| `config_space` |                                                                                                                                                            |   |
-| `title`        | if user-facing                                                                                                                                             |   |
-| `info`         |                                                                                                                                                            |   |
-| `labels`       |                                                                                                                                                            |   |
-| `synopsis`     |                                                                                                                                                            |   |
-| `cached`       |                                                                                                                                                            |   | 
+### `kind`/`id` are usually Required 
 
-## Parents and Children
+Whether or not an attribute is required is context-dependent, as we will see thoughout this document.
+A constant, however is that **all top-level descriptors**, require `kind` and `id` to be defined.
+A top level descriptor is any descriptor is that is **<u>not</u> defined inline**, 
+as [explained below](#inline-definition).
 
-Few models work alone. Most models inflate other models, either single models
-or collections. 
+## Model to Model Referencing 
 
-### Referencing a List of Children
+When writing a model descriptor, you will very often need to reference
+related models. The `DeleteResourcesAction` model, for instance, expects
+its `selectors` attribute to resolve to a **list of `ResourceSelector`**.
 
+There _four ways to achieve this_:
+
+### Method 1: Inline Definition
+
+The most straightforward but least scalable approach is just to
+declare child models inline:
+
+```yaml models/inline-definition-demo.yaml
+kind: DeleteResourcesAction
+id: parent
+selectors:
+  - kind: ResourceSelector
+    id: child-one
+    res_kind: ConfigMap
+  - kind: ResourceSelector
+    id: child-two
+    res_kind: Secret
+``` 
+
+**NB One**: `child-one` and `child-two` defined inline and are therefore not top-level. 
+This means that when the KAMA queries `ResourceSelector` outside of the scope above,
+**it will not see `child-one` and `child-two`.** 
+
+**NB Two**: `DeleteResourcesAction` knows it's looking for `ResourceSelector`s, so any 
+inline definitions can technically omit their `kind`, although this can hurt readability
+in some cases. So for example, the following snippet is equivalent to the original:
+
+```yaml models/inline-definition-demo.yaml
+kind: DeleteResourcesAction
+id: parent
+selectors:
+  - id: child-one
+    res_kind: ConfigMap
+  - id: child-two
+    res_kind: Secret
+``` 
+
+
+### Method 2: Id References with `id::`
+
+The second technique is to refer to another top-level model by its ID
+using the special syntax `id::<model-id>`, e.g `id::child-one` below. It does
+not matter whether the descriptor of the being referenced comes before or
+after in the YAML.  
+
+```yaml models/inline-definition-demo.yaml
+kind: ResourceSelector
+id: child-one
+res_kind: ConfigMap
+---
+
+kind: ResourceSelector
+id: child-two
+res_kind: Secret
+---
+
+kind: DeleteResourcesAction
+id: parent
+selectors
+  - id::child-one
+  - id::child-two
+``` 
+
+### Method 3: Singleton References with `kind::`
+
+Some models are conceptually singletons and never need to be customized
+by descriptors. For these, with can just refer to them by class name with 
+the `kind::<class-name>` e.g `kind::TruePredicate` as below.
+
+```yaml
+kind: ManifestVariable
+id: always-healthy
+info: No practical use; demo only
+health_predicates:
+  - kind::TruePredicate
+```
+
+### Method 4: Attribute Query
+
+By passing a Dict instead of a list,  
