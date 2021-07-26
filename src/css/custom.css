@@ -8,8 +8,8 @@
 /* You can override the default Infima variables here. */
 :root {
   /*--ifm-color-primary: #25c2a0;*/
-  --ifm-color-primary: #9CDCFE;
-  /*--ifm-color-primary: #f46036;*/
+  /*--ifm-color-primary: #9CDCFE;*/
+  --ifm-color-primary: #f46036;
   --ifm-color-primary-dark: rgb(33, 175, 144);
   --ifm-color-primary-darker: rgb(31, 165, 136);
   --ifm-color-primary-darkest: rgb(26, 136, 112);
@@ -37,8 +37,26 @@
 }
 
 blockquote {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+html[data-theme='dark'] blockquote {
   border-color: #9CDCFE;
 }
+
+html[data-theme='light'] blockquote {
+  border-color: #f46036;
+}
+
+html[data-theme='dark'] blockquote p {
+  color: whitesmoke;
+}
+
+html[data-theme='light'] blockquote p {
+  color: black;
+}
+
 
 html[data-theme='dark'] .docusaurus-highlight-code-line {
   background-color: rgba(0, 0, 0, 0.3);

@@ -58,11 +58,11 @@ as [explained below](#inline-definition).
 
 ## Model to Model Referencing 
 
-When writing a model descriptor, you will very often need to reference
+When writing a model descriptor, you will often need to reference
 related models. The `DeleteResourcesAction` model, for instance, expects
 its `selectors` attribute to resolve to a **list of `ResourceSelector`**.
 
-There _four ways to achieve this_:
+When writing a descriptor, you have _four ways_ to reference another model:
 
 ### Method 1: Inline Definition
 
@@ -71,13 +71,13 @@ declare child models inline:
 
 ```yaml models/inline-definition-demo.yaml
 kind: DeleteResourcesAction
-id: parent
+id: "parent"
 selectors:
   - kind: ResourceSelector
-    id: child-one
+    id: "child-one"
     res_kind: ConfigMap
   - kind: ResourceSelector
-    id: child-two
+    id: "child-two"
     res_kind: Secret
 ``` 
 
@@ -91,11 +91,11 @@ in some cases. So for example, the following snippet is equivalent to the origin
 
 ```yaml models/inline-definition-demo.yaml
 kind: DeleteResourcesAction
-id: parent
+id: "parent"
 selectors:
-  - id: child-one
+  - id: "child-one"
     res_kind: ConfigMap
-  - id: child-two
+  - id: "child-two"
     res_kind: Secret
 ``` 
 
@@ -109,20 +109,20 @@ after in the YAML.
 
 ```yaml models/inline-definition-demo.yaml
 kind: ResourceSelector
-id: child-one
+id: "child-one"
 res_kind: ConfigMap
 ---
 
 kind: ResourceSelector
-id: child-two
+id: "child-two"
 res_kind: Secret
 ---
 
 kind: DeleteResourcesAction
-id: parent
+id: "parent"
 selectors
-  - id::child-one
-  - id::child-two
+  - "id::child-one"
+  - "id::child-two"
 ``` 
 
 ### Method 3: Singleton References with `kind::`
@@ -132,13 +132,155 @@ by descriptors. For these, with can just refer to them by class name with
 the `kind::<class-name>` e.g `kind::TruePredicate` as below.
 
 ```yaml
-kind: ManifestVariable
-id: always-healthy
-info: No practical use; demo only
-health_predicates:
-  - kind::TruePredicate
+kind: DeleteResourcesAction
+id: parent
+selectors:
+  - kind::UnschedulablePodsSelector
 ```
 
 ### Method 4: Attribute Query
 
-By passing a Dict instead of a list,  
+By passing a dict instead of a list, your value will be 
+[Attribute Query](/tutorials/attribute-query-tutorial), which is very
+much like a [Label Selector](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/) 
+but for Models. For example:
+
+```
+kind: ActionsPanelAdapter
+id: parent
+operations:
+  id: operation.backend.*
+  labels:
+    concerning: database
+```
+
+Here, `operations` is a dict with an attribute query.
+
+
+## Special Attribute Resolution
+
+The most complicated but most powerful feature in the `Model` is its attribute
+resolution system. You will likely make extensive use of attribute resolution even
+if your NMachine is simple.
+
+**Normal attribute resolution** is when what you see is what you get. 
+Consider a descriptor like the following:
+
+```yaml
+kind: Model
+id: "normal-attr-demo"
+title: "I'm just a literal"
+```  
+
+We can easily imagine a `get_title()` instance method on `Model` that returns the value as-is
+with `self.config.get('title')`:
+
+```python
+print(Model.inflate("normal-attr-demo").get_title())
+# => "I'm just a literal"
+```
+
+In contrast, **_special_ attribute resolution** is when what you see is **not** what you get. 
+The next sections go over each case of this. 
+
+### Parent Lookback
+
+If you have a deep hierarchy of models, 
+it can be onerous to copy an attribute at each level of depth. Instead if a child could not find
+an attribute it expected to be in its own descriptor, it can automatically get it from its parent.
+Consider the following: 
+```yaml
+kind: MultiAction
+id: parent
+values:
+  "frontend.replicas": 2
+sub_actions:
+  - kind: TemplateManifestAction
+  - kind: PatchManifestVarsAction
+```
+
+Here, neither `TemplateManifestAction` or `PatchManifestVarsAction`
+define `values`, but both have access to it because their parent defines it.
+
+> **This behavior is not universal** across all Model subclasses and attributes. 
+As you progress through each Model's documentation, the attributes table will tell
+you whether a particular attribute supports lookback or not.
+
+### Self Referencing with `get::self>>`
+
+A descriptor can read its own configuration with the `get::self<attribute-key>` syntax,
+for example:
+
+```yaml
+kind: Model
+original: x
+copied: get::self>>original
+```
+
+#### Use Case 1: Readability and DRYness
+
+You can use this technique to create what are effectively instance variables that
+can be re-used. As a result, you can break long expressions into shorter ones:
+
+```yaml
+kind: FruitBowl
+apple: "An apple is an edible fruit produced by an apple tree (Malus domestica)"
+cherry: "A cherry is the fruit of many plants of the genus Prunus"
+contents: ["get::self>>apple", "get::self>>cherry"]
+best_fruit: "get::self>>cherry"
+```
+
+#### Use Case 2: Delegation  
+
+Self-referencing lets the KAMA SDK treat models almost like functions that
+can be invoked with parameters. For example, when the user sets a manifest
+variable value from the UI and it's time for the KAMA to validate it, 
+it can inflate your `ManifestVariable` with an attribute called `inputs`
+(or anything else) that contains the user input. 
+
+```yaml
+kind: ManifestVariable
+id: "prometheus.url"
+validators:
+  - kind: Predicate
+    operator: "truthiness"
+    challenge: "get::self>>inputs->.prometheus.url"
+```
+
+Cases when the SDK patches models at inflation time will always be documented.
+
+### Supplier Values with `get::`
+
+We must now introduce a special Model subclass: the **[`Supplier`](/models/supplier/supplier-overview.md)**. 
+A `Supplier`'s role is to return something. When a supplier is referenced using either technique 
+discussed in [Model to Model Referencing](model-to-model-referencing), it can be made to resolve
+to the result of whatever computation it performed. 
+
+When referencing using `id::` or `kind::`, you can enable this behavior by prefixing the entire
+expression with `get::`. For instance:
+
+```yaml
+kind: RandomStringSupplier
+id: my-supplier
+length: 32
+symbols: ["letters", "numbers"]
+
+---
+
+kind: ManifestVariable
+id: "database.password"
+default_value: "get::id::my-supplier"
+```  
+
+### Helper Values with `get::&`
+
+
+
+### Templated Strings with `${}`
+
+### List Splattering with `...`
+
+
+
+
+
