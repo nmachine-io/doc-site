@@ -19,12 +19,12 @@ Example that shows the mapping between models and final output:
 
 ## `Model` is a Python Class
 
-Before jumping into the YAML, it helps to understand how models work at a very basic level.
+Before jumping into the YAML, it helps to understand how models work at the most basic level.
 [`Model`](/nope) is a class in the KAMA SDK. A `Model` instance is constructed with
 a key-value configuration bundle that we call a **descriptor**. 
 For example, this is how the KAMA SDK might inflate a `Predicate` - a subclass of Model: 
 
-```python
+```python title="$ python3 main.py -m shell"
 predicate = Predicate.inflate({
   'title': "is 1 greater than 0?"
   'challenge': 1,
@@ -81,7 +81,16 @@ selectors:
     res_kind: Secret
 ``` 
 
-**NB One**: `child-one` and `child-two` defined inline and are therefore not top-level. 
+Running it:
+
+```python title="$ python3 main.py -m shell"
+parent = DeleteResourcesAction.inflate("parent")
+inflated_kids = parent.get_selectors()
+print([child.get_id() for child in inflated_kids])
+# => ['child-one', 'child-two']
+```
+
+**NB One**: `child-one` and `child-two` are defined inline and are therefore <u>not</u> top-level. 
 This means that when the KAMA queries `ResourceSelector` outside of the scope above,
 **it will not see `child-one` and `child-two`.** 
 
@@ -98,7 +107,6 @@ selectors:
   - id: "child-two"
     res_kind: Secret
 ``` 
-
 
 ### Method 2: Id References with `id::`
 
@@ -127,8 +135,8 @@ selectors
 
 ### Method 3: Singleton References with `kind::`
 
-Some models are conceptually singletons and never need to be customized
-by descriptors. For these, with can just refer to them by class name with 
+Some models are conceptually singletons because they don't read any attributes therefore
+cannot be customized by descriptors. For these, with can just refer to them by class name with 
 the `kind::<class-name>` e.g `kind::TruePredicate` as below.
 
 ```yaml
@@ -196,11 +204,17 @@ values:
   "frontend.replicas": 2
 sub_actions:
   - kind: TemplateManifestAction
-  - kind: PatchManifestVarsAction
 ```
 
-Here, neither `TemplateManifestAction` or `PatchManifestVarsAction`
-define `values`, but both have access to it because their parent defines it.
+Here, `TemplateManifestAction` does not define `values`, but has access to it because its parent defines it:
+
+```python title="$ python3 main.py -m shell"
+parent = MultiAction.inflate("parent")
+child = parent.sub_actions()[0]
+print(child.resolve_attr("values"))
+# => {'frontend': {'replicas': 2}}
+```
+
 
 > **This behavior is not universal** across all Model subclasses and attributes. 
 As you progress through each Model's documentation, the attributes table will tell
@@ -213,8 +227,17 @@ for example:
 
 ```yaml
 kind: Model
-original: x
+id: "demo-model"
+original: "123"
 copied: get::self>>original
+```
+
+Running it:
+
+```python title="$ python3 main.py -m shell"
+instance = Model.inflate("parent")
+print(instance.resolve_attr("original"))
+# => '123'
 ```
 
 #### Use Case 1: Readability and DRYness
@@ -249,7 +272,7 @@ validators:
 The `->.` syntax is explained later. Cases when the SDK patches models at 
 inflation time will always be documented.
 
-### Supplier Values with `get::`
+### Supplier Values with `get::id` and `get::kind`
 
 We must now introduce a special Model subclass: the **[`Supplier`](/models/supplier/supplier-overview.md)**. 
 A `Supplier`'s role is to return something. When a supplier is referenced using either technique 
@@ -277,22 +300,27 @@ default_value: "get::id::my-supplier"
 A `Supplier` can act as a helper by making its instance methods accessible
 as attributes as is explained in the [Supplier Overview](/model/suppliers/supplier-overview).
 For example, the `BestSiteEndpointSupplier` makes `as_url` 
-available as an attribute so that it can be used as follows:
+available as an attribute. Because it is a `Model` attribute, it is read with
+`>>`, rather than `=>` or `->`.
 
 ```yaml
 kind: BestSiteEndpointSupplier
-id: "my-supplier"
+id: "endpoint-supplier"
 site_access_nodes: #...more yaml
 
 ---
 
-kind: ConcernCardAdapter
-spec:
-  type: Section
-  elements:
-   - type: "Text"
-     text: "get::&id::my-supplier>>as_url"
+kind: Model
+id: "model-doing-the-get"
+value_we_want: "get::&id::endpoint-supplier>>as_url"
+```
 
+Running it:
+
+```python title="$ python3 main.py -m shell"
+instance = Model.inflate("model-doing-the-get")
+print(instance.resolve_attr("value_we_want"))
+# => "10.40.7.144"
 ```
 
 ### Templated Strings with `${}`
@@ -322,16 +350,22 @@ do this with the `...` syntax:
 
 ```yaml
 kind: Supplier
-id: "my-supplier"
+id: "my-list-supplier"
 source: ["apple", "banana"]
 
 ---
 
-kind: FruitBowl
-contents:
-  - "...get::my-supplier"
-  - cherry
+kind: Model
+id: "fruit-bowl"
+fruit:
+  - "...get::id::my-list-supplier"
+  - "kiwi"
 ```
 
+Running it:
 
-
+```python title="$ python3 main.py -m shell"
+instance = Model.inflate("fruit-bowl")
+print(instance.resolve_attr("fruit"))
+# => ["apple", "banana", "kiwi"]
+```

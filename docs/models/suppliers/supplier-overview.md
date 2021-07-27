@@ -1,17 +1,16 @@
 ---
 sidebar_position: 0
-sidebar_label: Suppliers
+sidebar_label: Overview
 ---
 
 # Suppliers
 
 A `Supplier` is a `Model` subclass whose role is to perform a computation and 
-_supply_ the result to other models. Practically speaking, Suppliers let you 
+_supply_ the result its parent model. Practically speaking, Suppliers let you 
 implement basic logic in YAML without constantly switching to Python. They are a bit like
 YAML-invokable functions.
 
-As a simple example, the `RandomStringSupplier` exists so that disparate models
-that might need to random strings don't each need 
+A simple real life example is the `RandomStringSupplier`:
 
 ```yaml
 kind: GenericVariable
@@ -28,23 +27,21 @@ default_value:
 
 ## Pre-Processing the Output
 
-Each `Supplier` subclass returns something different, but all are
-capable of customizing their final output based on the 
-serializer/output system. 
+Before returning its computed value, a `Supplier` uses a mechanism 
+that lets you transform computed value before it is returned. How that transformation
+happens depends on the value of `serializer` and `output`.
 
 ### The `jq` Serializer
 
 If `serializer` is `jq` and `output` is not null, then the final
 output is computed by running `output` as a [`jq`](https://stedolan.github.io/jq/manual/)
 query against the original result. For this to work, the original result 
-must be cast to the `JSON` schema.
+must be castable to `JSON`.
 
 ```yaml
 kind: Supplier
 id: my-suplier
-source:
-  foo:
-    bar: baz
+source: { foo: { bar: baz } }
 output: . foo
 ```
 
@@ -82,9 +79,12 @@ print(supplier.resolve())
 
 ### The `native` Serializer
 
-The second currently supported way to manipulate the original output is
+The second currently supported serializer is
 the `native` serializer. You should use this serializer if the original
 return value is a Python object whose properties/methods you need to access.
+
+> **There are obvious security risks** with this method. Whenever possible,
+use the `jq` serializer instead. 
 
 The most common reason to use the `native` serializer is to talk to `KatRes`
 objects. The following example demonstrates how the `native` serializer can:
@@ -129,10 +129,7 @@ supplier = Supplier.inflate("my-supplier")
 print(supplier.resolve())
 # => ['10.40.7.144']
 ```
- 
 
-> **There are obvious security risks** with this method. Whenever possible,
-use the `jq` serializer instead as it is much more powerful in most cases. 
 
 ## Syntactic Sugar: `->` and `=>` 
 
@@ -141,13 +138,39 @@ we can combine the `->` and `=>` syntax with the
 [`get::` syntax](/models/models-overview#supplier-values-with-get) to invoke a Supplier and 
 reformat its output using an expression instead of writing a descriptor.
 
-### Using `->` for a `jq` Serializer 
+### The `jq` Serializer Alias: `->` 
 
-
+We can use a real life example. The `MergedVariablesSupplier` returns 
+the application's manifest variables as a big Dict. The snippet below
+show how we can extract `frontend.service.type` from the aforementioned supplier 
+the long way and the short way. 
 
 ```yaml
 kind: Model
+id: "long-way"
+value_we_want: 
+  kind: MergedVariablesSupplier
+  serializer: "jq"
+  output: ". frontend.service.type"
+
+---
+
+kind: Model
+id: "short-way"
+value_we_want: "get::kind::MergedVariablesSupplier->. frontend.service.type" 
 ``` 
+
+The `value_we_want` is the same in both cases: 
+
+```python title="$ python3 main.py -m shell"
+v1 = Model.inflate("long-way").resolve_attr("value_we_want")
+v2 = Model.inflate("short-way").resolve_attr("value_we_want")
+
+print(v1 == v2)
+# => True
+```
+
+
 
 ## Special case: Provider
 
