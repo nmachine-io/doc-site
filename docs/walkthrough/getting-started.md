@@ -7,14 +7,83 @@ sidebar_label: "Getting Started"
 
 ## Synopsis
 
-**Objective**. Build a simple NMachine, learn the basics of the KAMA SDK along the way.
-
-**Requirements**. A Kubernetes Cluster and Python3.
+**Objective**. Build a simple KAMA for a simple Kubernetes app, learning the basics of
+the KAMA SDK along the way.
+**Requirements**: Python 3.8, a Kubernetes cluster, Docker, and `git`.
 
 
 ## Step 1: Create the project
 
+Cloning the `boilerplate-kama` project into your workspace and rename it to `ice-cream`:
+
+```shell script
+git clone git@github.com:nmachine-io/kama-boilerplate.git
+mv kama-boilerplate ice-cream-kama
+cd ice-cream-kama
+```
+
+Take note of the directory structure:
+
+```
+ice-cream-kama
+└───assets/
+└───descriptors/
+└───models/ 
+│   main.py
+│   Dockerfile
+│   Pipfile
+```
+
+## Step 2: Write the Hello World
+
+Before hooking up to Kubernetes, we want to make sure there are no problems 
+with the SDK and its dependencies. 
+It is strongly recommended you use an environment manager for Python like `pipenv`.
+Begin by installing the dependencies:
+
+```shell script
+# using pipenv
+pipenv install
+```
+
+Run the **[KAMA Interactive Shell](/tutorials/kama-shell-tutorial)** using the following
+command:
+
+```shell script {1}
+python3 main.py -m shell
+```
+
+You should see something like this:
+
+```shell script
+[k8kat::kube_broker] In-cluster auth...
+[k8kat::kube_broker] In-cluster connect Failed: Service host/port is not set.
+Type "help", "copyright", "credits" or "license" for more information.
+(InteractiveConsole)
+>>> 
+```
+
+Don't worry about `"In-cluster connect Failed"` just yet.
+Now run the Hello World:
+
+```python
+model = Model.inflate({'title': "Hello World"})
+model.get_title()
+# => 'Hello World'
+```
+
+### Step 1.1: Clone the Repo
+
+
+### Step 1.2: Inspect the 
+
+
+
+
 Create a directory 
+
+
+
 
 
 ## Step 2: Install the Client

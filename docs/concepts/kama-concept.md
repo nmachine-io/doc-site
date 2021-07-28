@@ -47,8 +47,9 @@ how the API's controllers, serializers, or routes work; instead you will focus o
 ### Models
 
 As a publisher building your KAMA, most of your focus will be Models. These are the logical
-entities that make up an NMachine, like a `ManifestVariable` or a 
-[`RunKubectlApplyAction`](/models/actions/kubernetes-actions#kubectlapplyaction). 
+entities that make up an NMachine, like a 
+[`ManifestVariable`](/models/variables/manifest-variables) or a 
+[`KubectlApplyAction`](/models/actions/kubernetes-actions#kubectlapplyaction). 
 As a publisher, your unique NMachine is defined by the Models you define. Find 
  comprehensive documentation starting in the [Models Overview](/models/models-overview.md).
 

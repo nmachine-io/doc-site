@@ -28,8 +28,8 @@ default_value:
 ## Pre-Processing the Output
 
 Before returning its computed value, a `Supplier` uses a mechanism 
-that lets you transform computed value before it is returned. How that transformation
-happens depends on the value of `serializer` and `output`.
+that lets you transform computed value before it is returned. The transformation
+itself depends on the value of `serializer` and `output`.
 
 ### The `jq` Serializer
 
@@ -40,9 +40,9 @@ must be castable to `JSON`.
 
 ```yaml
 kind: Supplier
-id: my-suplier
+id: "my-suplier"
 source: { foo: { bar: baz } }
-output: . foo
+output: ". foo"
 ```
 
 Running it in the KAMA shell:
@@ -62,7 +62,7 @@ the input as a list:
 
 ```yaml
 kind: Supplier
-id: my-supplier
+id: "my-supplier"
 many: true
 source:
   - foo:
@@ -93,7 +93,7 @@ objects. The following example demonstrates how the `native` serializer can:
 
 ```yaml
 kind: ResourcesSupplier
-id: my-supplier
+id: "my-supplier"
 serializer: "native"
 many: false
 selector: 
@@ -115,7 +115,7 @@ the strings corresponding to each `internal_ip`:
 
 ```yaml
 kind: ResourcesSupplier
-id: my-supplier
+id: "my-supplier"
 serializer: "native"
 many: true
 selector: 

@@ -36,9 +36,9 @@ The best way to build an intuition for this is to watch the
 
 ### 1. Confidence through Health Checks
 
-Operators build confidence about the state of an application
+In-house operators build confidence about the state of a Kubernetes app
 with liveness probes and tools ([Polaris](https://github.com/FairwindsOps/polaris), etc..), 
-**but what really matters** is _how well they know_ the app. NMachine makes it 
+_but what really matters_ is _how well they know_ the app. NMachine makes it 
 excessively easy for publishers to proliferate health checks throughout their platforms: 
 global checks, resource and variable-specific checks, preflight checks, etc...
 

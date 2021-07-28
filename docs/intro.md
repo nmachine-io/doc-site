@@ -7,7 +7,7 @@ sidebar_label: Welcome
 # Documentation for Publishers
 
 Welcome to the NMachine documentation site. Here you will find the resources to
-build and distribute your application-specific platform.
+develop and distribute your application-specific platform.
 
 If you're looking to _use_ existing NMachine apps, 
 head over to [an.nmachine.io](https://an.nmachine.io). Otherwise, choose where to go from here:
