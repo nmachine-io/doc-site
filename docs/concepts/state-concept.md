@@ -3,7 +3,7 @@ sidebar_label: State
 sidebar_position: 3
 ---
 
-# State: the Master ConfigMap
+# State in the KAMA: the Master ConfigMap
 
 When the NMachine client installs an application for a user (e.g creates _an_ NMachine), 
 it begins by creating a `ConfigMap` called `master` in the application's

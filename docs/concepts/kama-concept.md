@@ -5,20 +5,23 @@ sidebar_label: KAMA
 
 # Kubernetes Application Management API (KAMA)
 
-The KAMA is at the heart of NMachine. Recall that NMachine lets publishers
+The KAMA is your NMachine's brain. Recall that NMachine lets publishers
 **[digitize operational knowledge](/concepts/concepts-root#digitizing-operational-knowledge)**;
-the KAMA is where that happens. A KAMA is an HTTP-based API that is implements
+the KAMA is where you encode that knowledge. 
+
+Structurally, the KAMA is an HTTP-based API consumed by the NMachine client. 
+It is effectively the backend. That is implements
 the functionality needed to power an NMachine, namely talking to the Kubernetes
 cluster, read/writing manifest variables, running health checks, running actions, etc...   
 
 ## Building and Shipping a KAMA
 
 As a publisher, you will build your KAMA on top of the
-**[KAMA SDK](https://pypi.org/project/kama-sdk-py/)** for Python. Once it is ready, you
-will go to the [Publisher Dashboard](https://publish.nmachine.io) and reference
-your KAMA as part of your application definition. How and where your KAMA actually runs 
-is explained [here](#where-kama-servers-run). Building a KAMA with the SDK is the object
-of most of this site.
+**[KAMA SDK](https://pypi.org/project/kama-sdk-py/)** for Python. When it's ready, you'll
+create an application definition in the [Publisher Dashboard](https://publish.nmachine.io) 
+that points to it. How and where your KAMA actually runs 
+is explained [here](#where-kama-servers-run). Building a KAMA with the SDK is the focus
+of most of the documentation.
 
 Two points on the terminology we use going forward:
 - **"KAMA"**. Depending on the context, may be either a) a running instance

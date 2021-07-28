@@ -7,11 +7,12 @@ sidebar_label: Overview
 
 ## What is NMachine?
 
-As a quick and dirty mental placeholder, you can think of NMachine as the intersection of:
+For a rough mental placeholder, you can think of NMachine as the intersection of:
 - A Helm & Puppet wrapper
 - A Platform as Code SDK
 - A Kubernetes App-store
 - An application-specific Heroku
+
 
 **In wordier terms**, NMachine gives software publishers an SDK to build an application-specific platform 
 for a Kubernetes application, where operational knowledge is digitized,
@@ -23,7 +24,7 @@ telemetry access, release channels, payments/licenses, and rule-based last-mile 
 
 ## What is _an_ NMachine?
 
-Anytime we refer to **_<u>an</u>_** NMachine, we mean a running instance 
+Anytime we refer to **_an_** NMachine, we mean a running instance 
 of the application-specific platform. This the _an_ in [an.nmachine.io](https://an.nmachine.io).
 Akin to VMs being VMWare instances.
 

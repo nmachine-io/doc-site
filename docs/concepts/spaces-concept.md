@@ -3,17 +3,14 @@ sidebar_label: Spaces
 sidebar_position: 4
 ---
 
-# The Spaces System
+# The Spaces System in the KAMA SDK
 
 The KAMA supports Plugins, which are like mini-KAMAs that you as a publisher 
-can leverage to make your NMachine better for users.
-Plugins need have their own [state](/concepts/state-concept). Therefore,
-we need a system that lets your (the publisher's) and any plugins' KAMAs 
-coexist. This is the Spaces system. 
+can include in your own KAMA.
+Like the main KAMA, these mini-KAMAs also need to have their own [state](/concepts/state-concept)
+tracked.  
 
 
-Whether or not your KAMA includes plugins, it will still be bound
-to the `space` system.
 
 ## The `space` attribute
 
