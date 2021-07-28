@@ -14,7 +14,8 @@ the KAMA SDK along the way.
 
 ## Step 1: Create the project
 
-Cloning the `boilerplate-kama` project into your workspace and rename it to `ice-cream`:
+Clone the [`kama-boilerplate`](https://github.com/nmachine-io/kama-boilerplate) 
+project into your workspace and rename it to `ice-cream`:
 
 ```shell script
 git clone git@github.com:nmachine-io/kama-boilerplate.git
@@ -33,6 +34,8 @@ ice-cream-kama
 │   Dockerfile
 │   Pipfile
 ```
+
+
 
 ## Step 2: Write the Hello World
 
@@ -55,7 +58,7 @@ python3 main.py -m shell
 
 You should see something like this:
 
-```shell script
+```shell script title="python3 main.py -m shell"
 [k8kat::kube_broker] In-cluster auth...
 [k8kat::kube_broker] In-cluster connect Failed: Service host/port is not set.
 Type "help", "copyright", "credits" or "license" for more information.
@@ -66,7 +69,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 Don't worry about `"In-cluster connect Failed"` just yet.
 Now run the Hello World:
 
-```python
+```python title="python3 main.py -m shell"
 model = Model.inflate({'title': "Hello World"})
 model.get_title()
 # => 'Hello World'

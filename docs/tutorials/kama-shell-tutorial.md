@@ -15,7 +15,7 @@ classes. This is useful for efficiently introspecting your models, testing your
 [Suppliers](/models/suppliers/supplier-overview) / 
 [Predicates](/models/predicates/predicates-base) / 
 [Actions](/models/actions/action-base),
-and just generally getting comfortable with the KAMA SDK. 
+and generally getting comfortable with the KAMA SDK. 
 
 ## Starting the Shell
 

@@ -7,7 +7,8 @@ sidebar_label: Overview
 
 Models the are the entities that make up the KAMA's world view. The SDK provides
 a multitude of models, which you, as a publisher, create instances of 
-using YAML or Python, giving your NMachine its behavior. Models are conceptually quite similar 
+using [descriptors](/tutorials/startup-sequence-tutorial#registering-your-model-descriptors), 
+giving your NMachine its behavior. Models are conceptually quite similar 
 to Resources in Kubernetes. 
 
 Example that shows the mapping between models and final output:
@@ -17,44 +18,77 @@ Example that shows the mapping between models and final output:
 </p>
 
 
+
+
+
+
 ## `Model` is a Python Class
 
-Before jumping into the YAML, it helps to understand how models work at the most basic level.
+Before jumping into the configs, it helps to understand how Models work at the most basic level.
 [`Model`](/nope) is a class in the KAMA SDK. A `Model` instance is constructed with
 a key-value configuration bundle that we call a **descriptor**. 
-For example, this is how the KAMA SDK might inflate a `Predicate` - a subclass of Model: 
+Constructing an instance of a `Model` from a `descriptor` dict is easy: 
 
 ```python title="$ python3 main.py -m shell"
-predicate = Predicate.inflate({
-  'title': "is 1 greater than 0?"
-  'challenge': 1,
-  'check_against': 0,
-  'operator': "greater-than"
+model = Model.inflate({
+  'id': 'my-first-model',
+  'title': "Hello Model!"
 })
-print(f"Inflated from {predicate.config}")
+model.get_id()
+# => my-first-model
 ```
 
-Without going into detail, the `Predicate` class **will expect certain key-value pairs** 
-to be present so it can read them for computations. The descriptor can be 
-gotten by calling `config` property on a Model instance.
-
-In practice, you'll probably write your descriptors in YAML as explained in the 
-[Registering YAML Model Descriptors](/tutorials/registering-model-descriptors) tutorial.
+In practice, you'll want write your descriptors in YAML as explained in 
+**[Registering YAML Model Descriptors](/tutorials/registering-model-descriptors)**. Most
+descriptors in the docs are expressed in YAML so make sure you are comfortable 
+with this concept.
 
 
-## Universal Attributes
 
-`Model`, and therefore all of its subclasses, can read the following attributes from its descriptor: 
-Depending on the context,
+
+
+
+
+## Bound Attributes
+
+An attribute in a descriptor is **"bound"** if its descriptor's `Model` subclass reads it. You know
+which attributes are bound by looking at the Bound Attributes Table in a Model's reference docs.
+
+An attribute that is not read by the wrapping `Model` subclass is **free**. Why would you want
+to write attributes that the model does not read? The answer is given
+[later in the document](#self-referencing-with-getself).
  
+### Universal Bound Attributes
+
+The `Model` base class, and therefore all of its subclasses, 
+reads the following attributes:
+
 {@import ./../../partials/common-model-attrs.md}
 
-### `kind`/`id` are usually Required 
 
-Whether or not an attribute is required is context-dependent, as we will see thoughout this document.
-A constant, however is that **all top-level descriptors**, require `kind` and `id` to be defined.
-A top level descriptor is any descriptor is that is **<u>not</u> defined inline**, 
-as [explained below](#inline-definition).
+**Example of a Free Attribute**. Now that we know what the bound attributes for 
+a `Model` from the table above, we also know that for `Model` itself, 
+_a free attribute is anything not on that list_, such as `"foo"`:
+```yaml
+kind: Model
+id: "i-am-bound"
+title: "Me too!"
+foo: "I am free!"
+```
+
+
+
+
+
+## Inflating Models
+
+As we have seen informally, you inflate a `Model` subclass either directly
+or by reference, e.g passing the as 
+
+
+
+
+
 
 ## Model to Model Referencing 
 
@@ -171,25 +205,28 @@ The most complicated but most powerful feature in the `Model` is its attribute
 resolution system. You will likely make extensive use of attribute resolution even
 if your NMachine is simple.
 
-**Normal attribute resolution** is when what you see is what you get. 
+**Normal** attribute resolution is when **what you see is what you get**. 
 Consider a descriptor like the following:
 
 ```yaml
 kind: Model
 id: "normal-attr-demo"
-title: "I'm just a literal"
+my_literal: "I'm just a literal"
 ```  
 
-We can easily imagine a `get_title()` instance method on `Model` that returns the value as-is
-with `self.config.get('title')`:
+What we see is what we get:
 
-```python
-print(Model.inflate("normal-attr-demo").get_title())
+```python title="$ python3 main.py -m shell"
+model = Model.inflate("normal-attr-demo")
+model.get_attr("my_literal")
 # => "I'm just a literal"
 ```
 
-In contrast, **_special_ attribute resolution** is when what you see is **not** what you get. 
+In contrast, **special** attribute resolution is when what you see is **not** what you get. 
 The next sections go over each case of this. 
+
+
+
 
 ### Parent Lookback
 
@@ -215,10 +252,15 @@ print(child.resolve_attr("values"))
 # => {'frontend': {'replicas': 2}}
 ```
 
+:::caution
 
-> **This behavior is not universal** across all Model subclasses and attributes. 
-As you progress through each Model's documentation, the attributes table will tell
-you whether a particular attribute supports lookback or not.
+**Many Bound Attributes Prevent Lookback**. As you progress through each
+Model's documentation, the attributes table will tell
+you whether a particular attribute supports lookback or not. Free attributes, on 
+the other hand, always support lookback.
+
+:::
+
 
 ### Self Referencing with `get::self>>`
 
@@ -247,8 +289,8 @@ can be re-used. As a result, you can break long expressions into shorter ones:
 
 ```yaml {4,5}
 kind: FruitBowl
-apple: "An apple is an edible fruit produced by an apple tree (Malus domestica)"
-cherry: "A cherry is the fruit of many plants of the genus Prunus"
+apple: "Long text..."
+cherry: "More long text..."
 contents: ["get::self>>apple", "get::self>>cherry"]
 best_fruit: "get::self>>cherry"
 ```

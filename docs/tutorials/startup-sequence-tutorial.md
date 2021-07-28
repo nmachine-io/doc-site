@@ -8,26 +8,38 @@ sidebar_label: Startup Sequence
 When you build on top of the KAMA SDK, your `main.py` is your KAMA's entrypoint.
 You must do three things in your `main.py`:
 
-1. **Register** your model descriptors, custom model, and asset files 
+1. **Register** your model descriptors, custom models, and asset files 
 1. **Register** any plugins your KAMA uses
-1. **Yield** control to the SDK's master `start` routine 
+1. **Yield** control to the SDK's master entrypoint 
    
-Inspecting `main.py` in **[KAMA Boilerplate](https://github.com/nmachine-io/kama-boilerplate)**,
-which it is strongly recommended you use, the three steps above are apparent:  
+Inspecting `main.py` in **[KAMA Boilerplate](https://github.com/nmachine-io/kama-boilerplate)**
+(which it is strongly recommended you use) the three steps above are apparent:  
 
 ```python main.py
 import os
 
 from kama_sdk import entrypoint
 from kama_sdk.model.base.model import models_man
-from kama_sdk.core.core import utils
+from kama_sdk.utils import loading_utils
 
 
-def register_self():
-  root_dir = os.path.dirname(os.path.abspath(__file__))
-  descriptors = utils.yamls_in_dir(f'{root_dir}/descriptors', recursive=True)
+root_dir = os.path.dirname(os.path.abspath(__file__))
+
+
+def register_own_descriptors():
+  path = f'{root_dir}/descriptors'
+  descriptors = loading_utils.load_dir_yaml_dicts(path, recursive=True)
   models_man.add_descriptors(descriptors)
+
+
+def register_own_assets():
   models_man.add_asset_dir_paths([f'{root_dir}/assets'])
+
+
+def register_own_models():
+  path = f'{root_dir}/models'
+  classes = loading_utils.load_dir_model_subclasses(path)
+  print(classes)
 
 
 def register_plugins():
@@ -36,36 +48,17 @@ def register_plugins():
 
 if __name__ == '__main__':
   register_plugins()
-  register_self()
+  register_own_descriptors()
+  register_own_assets()
   entrypoint.start()
 ```
 
 ## Registering your Model Descriptors 
 
-To pass your model
-
-In your KAMA's `main.py` (or wherever your `if __name__ == '__main__'` is),
-you need to tell the KAMA SDK about all your model descriptors so is can load
-them into memory. This is accomplished with `models_man.add_descriptors()`.
-
-### The General Case
-
-You need to pass all your descriptors to
-the `models_man` during your NMachine's startup sequence:  
-
-```python title=main.py
-from kama_sdk.model.base.model import models_man
-
-def main():
-  models_man.add_descriptors([{
-    'kind': 'TemplateManifestAction',
-    'id': 'demo-action',
-    'values': {'frontend': {'replicas': 2}}
-  }]
-
-if __name__ == '__main__':
-  main()
-```  
+In your KAMA's `main.py`, you need to tell the KAMA SDK about 
+all your model descriptors so it can load them into memory. 
+You do this by calling `models_man.add_descriptors` with a list of `dict` as the 
+sole argument.
 
 ### From YAML Files
 
@@ -102,6 +95,27 @@ code grows, you'll likely want to generate descriptors programmatically.
 
 Everything given to the `models_man` will be in memory for server's
 lifetime. Because NMachines have multiple processes, you cannot add descriptors after startup. 
+
+
+### The General Case
+
+You need to pass all your descriptors to
+the `models_man` during your NMachine's startup sequence:  
+
+```python title=main.py
+from kama_sdk.model.base.model import models_man
+
+def main():
+  models_man.add_descriptors([{
+    'kind': 'TemplateManifestAction',
+    'id': 'demo-action',
+    'values': {'frontend': {'replicas': 2}}
+  }]
+
+if __name__ == '__main__':
+  main()
+```  
+
 
 
 ## Registering Custom Models

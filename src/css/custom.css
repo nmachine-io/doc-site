@@ -42,7 +42,8 @@ blockquote {
 }
 
 html[data-theme='dark'] blockquote {
-  border-color: #9CDCFE;
+  /*border-color: #9CDCFE;*/
+  border-color: #f46036;
 }
 
 html[data-theme='light'] blockquote {

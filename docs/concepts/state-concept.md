@@ -61,18 +61,18 @@ The table below gives the purpose of each field in a space entry.
 | `user_variables`      | Variable assignments made by the user with the NMachine client                                      |
 | `last_synced`         | Timestamp of last successful status/telem sync with `api.nmachine.io`                               |
 
-### `ktea` Dict Format
 
-The `ktea` entry is itself a Dict. Its own contents are as follows. 
+
+
+### `ktea` & `kama` Dict Formats
+
+The `ktea` and `kama` entries are themselves Dict. They share the same schema: 
 
 {@import ./../../partials/ktea-dict.md}
 
-### `kama` Dict Format
 
-Identical to the `ktea` dict format above. An important conceptual difference
-is the `ktea` entry, is that, unlike it, **the `kama` entry is not actionable**
-by the KAMA itself:
-it is metadata that can be shown to the user and used for telemetry.
+
+
 
 ## Manifest Variables
 
@@ -98,6 +98,10 @@ The diagram below summarizes the lifecycle of the three variable levels.
 
 While building your KAMA, you should not write to the `default_vars` or
 `injection_vars`; this is taken care of by the SDK.  
+
+
+
+
 
 
 ## Access with the KAMA SDK
