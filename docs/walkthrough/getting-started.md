@@ -3,23 +3,24 @@ sidebar_position: 0
 sidebar_label: "Getting Started"
 ---
 
-# Learn by Building an NMachine
+# Building your first NMachine
 
 ## Synopsis
 
 **Objective**. Learn **[KAMA](/concepts/kama-concept)** development by writing a
 simple KAMA for a simple, pre-built app 
-(called [Ice Kream 🍦](https://github.com/nmachine-io/playground/tree/master/ice-cream/app)). By the
-end, we will have a publishable NMachine.  
+([Ice Kream 🍦](https://github.com/nmachine-io/playground/tree/master/ice-cream/app)). 
+Make sure you've seen the demo video; this walkthrough is more or less structured around
+how to build each page in the app.
 
 **Requirements**. 
-1. Python 3.8. Strongly recommended: [Pipenv](https://pipenv.pypa.io/en/latest/).
-1. A Kubernetes cluster. Strongly recommended: [k9s](https://github.com/derailed/k9s).
+1. Python 3.8. Plus, strongly recommended: [Pipenv](https://pipenv.pypa.io/en/latest/).
+1. A Kubernetes cluster. Plus, strongly recommended: [k9s](https://github.com/derailed/k9s).
 1. Docker and `git`.
 
 **Non-Objectives**:
 1. Publishing our NMachine to the App Store. For that, [go here](/tutorials/publishing-tutorial.md).
-1. Developing the actual app, or its Helm chart.
+1. Developing the underlying app, its Helm chart, or its [KTEA](/tutorials/helm-to-ktea-tutorial).
 
 
 
@@ -28,7 +29,7 @@ end, we will have a publishable NMachine.
 ## Step 1: Create the Project
 
 Clone the [`kama-boilerplate`](https://github.com/nmachine-io/kama-boilerplate) 
-project into your workspace and rename it to `ice-cream`:
+project into your workspace and rename it to `ice-kream`:
 
 ```shell script
 git clone git@github.com:nmachine-io/kama-boilerplate.git
@@ -52,7 +53,7 @@ ice-cream-kama
 
 
 
-## Step 2: Hello Interactive Shell
+## Step 2: Hello KAMA Interactive Shell
 
 We want to make sure that 1) there are no problems 
 with the SDK and its depenencies, and 2) your Kubernetes cluster is reachable.
@@ -87,7 +88,7 @@ If you noticed any Kubernetes-like errors when the shell started, or if
 
 
 
-## Step 3: Hello KTEA, Hello Ice Kream
+## Step 3: Hello KTEA (Optional)
 
 A **[KTEA (Kubernetes Templating Engine API)](/concepts/ktea-concept)** 
 lets you serve a templating engine (like Helm) over HTTP/JSON. 
@@ -105,7 +106,7 @@ curl -X POST "$BASE_URL/template?release_name=hello_ktea"
 Take a second to understand how the results match 
 the concepts from the [KTEA overview](/concepts/ktea-concept).
 
-**Optional: Hello 🍦**. You may want to try applying this manifest
+**Optional**. You may want to try applying this manifest
 to your cluster and seeing the Ice Kream homepage:
 
 ```shell script
@@ -117,7 +118,8 @@ echo $MANIFEST | kubectl apply -f -
 kubectl port-forward svc/app 80:8080 -n ice-cream-test
 ```
 
-Ensure the app is running: [localhost:8080](http://localhost:8080).
+Ensure the app is running: [localhost:8080](http://localhost:8080). Clean up by deleting
+our temporary namespace: `kubectl delete ns/ice-kream-test`.
 
 
 
@@ -125,13 +127,23 @@ Ensure the app is running: [localhost:8080](http://localhost:8080).
 
 ## Step 4: Hello NMachine Client
 
-Download and install the **[NMachine Client](https://www.nmachine.io/client)**. 
+**Start the Server & Worker Processes**. From your project root, open two terminals and enter:
+
+```shell script
+python3 main.py # from one terminal
+python3 main.py -m worker # from the other terminal
+``` 
+
+**Download and install the [NMachine Client](https://www.nmachine.io/client)**. 
 
 Start the client and click the "tools" icon on the left. You should see the following.
 
 ![](/img/walkthrough/client-dev-flow-1.png)
 
+Fill out the form as follows:
+- **KTEA Type**: Static Server
+- **KTEA URI**: thing
+- **KAMA Type**: Local Server
+- **KAMA URI**: http://localhost:5000
 
-
-
-## Step 4: NMachine Client
+Then, click through the steps until the NMachine is installed.

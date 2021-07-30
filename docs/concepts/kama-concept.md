@@ -10,14 +10,16 @@ The KAMA is your NMachine's brain. Recall that NMachine lets publishers
 the KAMA is where you encode that knowledge. 
 
 Structurally, the KAMA is an HTTP-based API consumed by the NMachine client. 
-It is effectively the backend. That is implements
-the functionality needed to power an NMachine, namely talking to the Kubernetes
-cluster, read/writing manifest variables, running health checks, running actions, etc...   
+It is the backend that computes all the values and performs all
+the work requested by the user via the NMachine client. 
+
+
+
 
 ## Building and Shipping a KAMA
 
-As a publisher, you will build your KAMA on top of the
-**[KAMA SDK](https://pypi.org/project/kama-sdk-py/)** for Python. When it's ready, you'll
+As a publisher, you build your KAMA on top of the
+**[KAMA SDK](https://pypi.org/project/kama-sdk-py/)** for Python. When it's ready, you
 create an application definition in the [Publisher Dashboard](https://publish.nmachine.io) 
 that points to it. How and where your KAMA actually runs 
 is explained [here](#where-kama-servers-run). Building a KAMA with the SDK is the focus
@@ -77,8 +79,8 @@ can **support multiple methods** and let each end-user choose their preferred me
 
 ### Option 1: Managed on NMachine
 
-If you Dockerize and `push` your KAMA server to an artifact repo on the web, you can point
-[publish.nmachine.io](https://publish.nmachine.io). It will then host it at
+If you Dockerize and `push` your KAMA to an artifact repo on the web, you can point
+[NMachine](https://publish.nmachine.io) to it. It will then host it at
 `api.nmachine.io/kama/$org/$app_id`. The benefit of this option 
 (beyond "serverless"-ness) is that you can set access control rules
 e.g "deny access to anybody with an expired license". It also spares the 
@@ -86,7 +88,7 @@ user the need to run one more (relatively heavy) workload in their cluster.
 
 ### Option 2: In-Cluster Server
 
-Assuming again that your KAMA server can run as a Docker image, you can make it so that 
+Again, if you Dockerize your KAMA, you can make it so that 
 the NMachine client creates a special workload in your user's cluster that runs that image. 
 If your end users are running your app air-gappped, you'll want to support this strategy.    
 

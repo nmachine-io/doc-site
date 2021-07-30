@@ -1,5 +1,5 @@
 const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/vsDark');
+const darkCodeTheme = require('prism-react-renderer/themes/oceanicNext');
 
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
@@ -20,7 +20,7 @@ module.exports = {
   themeConfig: {
 
     colorMode: {
-      defaultMode: 'dark',
+      defaultMode: 'light',
       disableSwitch: false,
     },
 
@@ -31,12 +31,12 @@ module.exports = {
         src: 'https://uploads-ssl.webflow.com/60f53868cd59a339d865d5f7/60f53a4fb13e234185eb4c7f_57038906.png'
       },
       items: [
-        {
-          type: 'doc',
-          docId: 'intro',
-          position: 'left',
-          label: 'Tutorial',
-        },
+        // {
+        //   type: 'doc',
+        //   docId: 'intro',
+        //   position: 'left',
+        //   label: 'Tutorial',
+        // },
 
         {
           href: 'https://publish.nmachine.io',
@@ -96,9 +96,9 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
     },
     prism: {
-      theme: darkCodeTheme,
-      // theme: lightCodeTheme,
+      // lightTheme: lightCodeTheme,
       darkTheme: darkCodeTheme,
+      theme: lightCodeTheme
     },
   },
   presets: [

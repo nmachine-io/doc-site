@@ -90,13 +90,19 @@ or by reference, e.g passing the as
 
 
 
-## Model to Model Referencing 
+## Model to Model Associations 
 
-When writing a model descriptor, you will often need to reference
-related models. The `DeleteResourcesAction` model, for instance, expects
-its `selectors` attribute to resolve to a **list of `ResourceSelector`**.
+Many Models in the KAMA SDK have a **belonging relationship** with other models. Using
+the classic ORM example, a `Company < Model` would have an `employees` attribute 
+with a list of `Employee < Model`. 
 
-When writing a descriptor, you have _four ways_ to reference another model:
+To learn what a specific Model subclass' relationships are, find the model in the 
+documentation and read its "Attributes Table". You'll note that relationships are 
+always parent -> child, never the reverse.
+
+For example, **[reading the Attributes Table](/nope)** for a `DeleteResourcesAction` 
+tells us that its `selectors` attribute must be `List[ResourceSelector]`.
+How do we express this relationship? The are four ways do it:
 
 ### Method 1: Inline Definition
 
@@ -110,6 +116,7 @@ selectors:
   - kind: ResourceSelector
     id: "child-one"
     res_kind: ConfigMap
+
   - kind: ResourceSelector
     id: "child-two"
     res_kind: Secret
@@ -119,8 +126,8 @@ Running it:
 
 ```python title="$ python3 main.py -m shell"
 parent = DeleteResourcesAction.inflate("parent")
-inflated_kids = parent.get_selectors()
-print([child.get_id() for child in inflated_kids])
+inflated_children = parent.get_selectors()
+[child.get_id() for child in inflated_children]
 # => ['child-one', 'child-two']
 ```
 
@@ -130,17 +137,11 @@ This means that when the KAMA queries `ResourceSelector` outside of the scope ab
 
 **NB Two**: `DeleteResourcesAction` knows it's looking for `ResourceSelector`s, so any 
 inline definitions can technically omit their `kind`, although this can hurt readability
-in some cases. So for example, the following snippet is equivalent to the original:
+in some cases.
 
-```yaml models/inline-definition-demo.yaml
-kind: DeleteResourcesAction
-id: "parent"
-selectors:
-  - id: "child-one"
-    res_kind: ConfigMap
-  - id: "child-two"
-    res_kind: Secret
-``` 
+
+
+
 
 ### Method 2: Id References with `id::`
 
@@ -149,20 +150,22 @@ using the special syntax `id::<model-id>`, e.g `id::child-one` below. It does
 not matter whether the descriptor of the being referenced comes before or
 after in the YAML.  
 
-```yaml models/inline-definition-demo.yaml
+```yaml models/inline-definition-demo.yaml {15-18}
 kind: ResourceSelector
 id: "child-one"
 res_kind: ConfigMap
+
 ---
 
 kind: ResourceSelector
 id: "child-two"
 res_kind: Secret
+
 ---
 
 kind: DeleteResourcesAction
 id: "parent"
-selectors
+selectors:
   - "id::child-one"
   - "id::child-two"
 ``` 
@@ -173,11 +176,11 @@ Some models are conceptually singletons because they don't read any attributes t
 cannot be customized by descriptors. For these, with can just refer to them by class name with 
 the `kind::<class-name>` e.g `kind::TruePredicate` as below.
 
-```yaml
+```yaml {3-4}
 kind: DeleteResourcesAction
 id: parent
 selectors:
-  - kind::UnschedulablePodsSelector
+  - "kind::UnschedulablePodsSelector"
 ```
 
 ### Method 4: Attribute Query
@@ -185,18 +188,19 @@ selectors:
 By passing a dict instead of a list, your value will be 
 [Attribute Query](/tutorials/attribute-query-tutorial), which is very
 much like a [Label Selector](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/) 
-but for Models. For example:
+but for Models. An example with the [`ActionsPanelAdapter`](/nope) that expects `operations` to be a
+`List[Operation]`.
 
-```
+```yaml title="descriptors/demo.yaml" {3-7}
 kind: ActionsPanelAdapter
-id: parent
+id: "parent"
 operations:
-  id: operation.backend.*
+  id: "operation.backend.*"
   labels:
-    concerning: database
+    concerning: "database"
 ```
 
-Here, `operations` is a dict with an attribute query.
+This is most useful when you  need to be e
 
 
 ## Special Attribute Resolution
@@ -205,7 +209,7 @@ The most complicated but most powerful feature in the `Model` is its attribute
 resolution system. You will likely make extensive use of attribute resolution even
 if your NMachine is simple.
 
-**Normal** attribute resolution is when **what you see is what you get**. 
+**_Normal_ attribute resolution is when what you see is what you get**. 
 Consider a descriptor like the following:
 
 ```yaml
@@ -243,7 +247,7 @@ sub_actions:
   - kind: TemplateManifestAction
 ```
 
-Here, `TemplateManifestAction` does not define `values`, but has access to it because its parent defines it:
+Here, `TemplateManifestAction` does not define `values`, but can resolve it because its parent defines it:
 
 ```python title="$ python3 main.py -m shell"
 parent = MultiAction.inflate("parent")
@@ -252,14 +256,6 @@ print(child.resolve_attr("values"))
 # => {'frontend': {'replicas': 2}}
 ```
 
-:::caution
-
-**Many Bound Attributes Prevent Lookback**. As you progress through each
-Model's documentation, the attributes table will tell
-you whether a particular attribute supports lookback or not. Free attributes, on 
-the other hand, always support lookback.
-
-:::
 
 
 ### Self Referencing with `get::self>>`

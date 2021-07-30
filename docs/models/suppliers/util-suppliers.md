@@ -1,16 +1,21 @@
 ---
-sidebar_label: Utility Suppliers  
+sidebar_label: Utilities  
 sidebar_position: 1
 ---
 
 # Utility Suppliers
 
-We label the `Supplier` subclasses below as "utilities" as they perform
-generic computations unspecific to Kubernetes or NMachine. 
+The following `Supplier` subclasses perform boilerplate computations
+found in most functional programming languages.
+
+
+
 
 ## MergeSupplier
 
-Merges the list of `dict` it receives as input:
+Merges the list of `dict` it receives as input.
+
+Example:
 
 ```yaml
 kind: MergeSupplier
@@ -26,9 +31,20 @@ Running it:
 
 ```python title="$ python3 main.py -m shell"
 supplier = MergeSupplier.inflate("my-supplier")
-print(supplier.resolve())
+supplier.resolve()
 # => {'foo': 'strong_foo', 'bar': 'bar'} 
 ```
+
+### Attributes Table
+
+| Key      | Type         | Lookback | Notes                                                                   |
+|----------|--------------|----------|-------------------------------------------------------------------------|
+| `source` **required** | `List[Dict]` | No       | List of dictionaries to be merged. First is weakest, last is strongest. |
+
+
+
+
+
 
 ## UnsetSupplier
 
@@ -54,6 +70,17 @@ print(supplier.resolve())
 # => {'foo': {'baz': 'survivor'} } 
 ```
 
+### Attributes Table
+
+| Key                        | Type        | Cached? | Lookback | Notes                                                   |
+|----------------------------|-------------|---------|----------|---------------------------------------------------------|
+| `source` **required**      | `Dict`      | No      | No       | Deep or flat dictionary from which keys will be unset   |
+| `victim_keys` **required** | `List[str]` | No      | No       | List of deep keys to unset from the `source` dictionary |
+
+
+
+
+
 
 ## IfThenElseSupplier
 
@@ -75,14 +102,28 @@ print(supplier.resolve())
 # => "true is true" 
 ```
 
+### Attributes Table
+
+| Key                   | Type   | Cached? | Lookback | Notes                                                                    |
+|-----------------------|--------|---------|----------|--------------------------------------------------------------------------|
+| `source` **required** | `bool` | No      | No       | The conditional. Most likely a an expression to resolve to a `Predicate` |
+| `if_true`             | `Any`  | No      | No       | What to return if `source` evaluates to a truthy value                   |
+| `if_false`            | `Any`  | No      | No       | What to return if `source` evaluates to a falsy value                    |
+
+
+
+
+
+
 ## ListFilterSupplier
 
 Conceptually identical to `filter` in popular functional programming languages. Given 
 a `Predicate` and a list, returns the list filtered by items
-who made the `Predicate` evaluate to `true`. 
+for which, when given as input to the predicate, made the predicate evaluate to true. 
 
 This works by patching the `predicate` with a `subject` attribute that holds the value
 of the item currently being looked at. 
+
 
 ```yaml
 kind: ListFilterSupplier
@@ -102,6 +143,17 @@ supplier = IfThenElseSupplier.inflate("my-supplier")
 print(supplier.resolve())
 # => [2, 3] 
 ```
+
+### Attributes Table
+
+| Key                   | Type        | Cached? | Lookback | Notes                                                                                                                                  |
+|-----------------------|-------------|---------|----------|----------------------------------------------------------------------------------------------------------------------------------------|
+| `source` **required** | `List`      | No      | No       | A list of anything                                                                                                                     |
+| `predicate`           | `Predicate` | N/A     | N/Aa     | Reference to the `Predicate` that will act as the filter on each item in `source`. Will be inflated `subject` set to the current item. |
+
+
+
+
 
 
 ## JoinSupplier

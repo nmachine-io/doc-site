@@ -1,32 +1,47 @@
 ---
-title: Predicates
-sidebar_label: Overview
-sidebar_position: 0
+sidebar_label: Predicates
+sidebar_position: 1
 ---
 
-A `Predicate` is a special [`Supplier`](/models/suppliers/supplier-overview) 
-that can only resolve to `True/False`. Most predicates work by comparing 
-two values: `challenge` and `check_against`. A simple predicate check 
-to whether `5` is more than `4` in YAML would be:
+# Predicates
+
+## Base Predicate
+
+A `Predicate` is a `Supplier` subclass that that can only resolve to `True/False`. 
+Most predicates work by comparing 
+two values: `challenge` and `check_against`. An example predicate that checks 
+whether `5 > 4`:
 
 ```yaml
 kind: Predicate
-id: trivial-predicate
-operator: greater-than
+id: "my-predicate"
+operator: "greater-than"
 challenge: 5
 check_against: 4
 ```  
 
-Every `Predicate` is a subclass of `Supplier`, so the above would return `True` 
-when resolved:
+Running it:
 
-```python
-predicate = Predicate.inflate('trivial-predicate')
-print(f"5 > 4: {predicate.resolve()}")
->> 5 > 4: True
+```python title="python3 main.py -m shell"
+predicate = Predicate.inflate('my-predicate')
+predicate.resolve()
+# => True
 ```
 
-## Operators
+
+### Attributes Table
+
+| Key                      | Type   | Cached? | Lookback | Notes                                                                  |
+|--------------------------|--------|---------|----------|------------------------------------------------------------------------|
+| `challenge` **required** | `Any`  | Yes     | No       | Left operand if a binary operation, or sole operand if unary operation |
+| `check_against`          | `Any`  | Yes     | No       | Right operand if a binary operation, ignored otherwise                 |
+| `operator` (`equals`)    | `str`  | No      | No       | Logical operator. See list for supported operator                      |
+| `negate`                 | `bool` | No      | No       | If true, flip the original computation's result                        |
+| `reason`                 | `str`  | Yes     | Yes      | Message to be displayed to the user if evaluates to false              |
+| `fatal` (`True`)         | `bool` | No      | No       | Used by called to determine what happens if evaluates to false         |
+
+
+### Operators
 
 The value of `challenge` will be interpreted as the **left hand operand** in the 
 comparison, and `check_against` will be the **right hand operand**. Thus, the following
@@ -71,16 +86,56 @@ supplied. Explained by example:
 
 
 
+## MultiPredicate
+
+Use the `MultiPredicate` subclass to perform AND/OR operations
+on other predicates:
+
+```yaml
+kind: MultiPredicate
+operator: and
+predicates:
+
+  - kind: Predicate
+    challenge: foo
+    check_against: foo
+  
+  - kind: Predicate
+    challenge: bar
+    check_against: baz   
+```
+
+The legal operator values are `and` and `or` in lower case. Anything else
+returns `False` automatically.
+
+
+## FormatPredicate
+
+Use the `FormatPredicate` to check various properties of strings:
+
+| `check_against`   | True Examples             | False Examples         |
+|-------------------|---------------------------|-----------------------|
+| `number`          | `0`, `-1.0`, `".3"`, `2e10`     | `"1x"`, `False`, `[]` |
+| `positive-number` | `1`, `"2"`                | `0`, `"-1"`           |
+| `email`           | `info@nmachine.io`        | `foo`, `1`            |
+| `boolean`         | `True`, `"False"`, `true` | `1`, `"yes"`            |
+| `domain`          | `"foo.bar"`               | `"foo dot bar"`       |
+| `path`            | `"/foo/bar.baz"`          | `"foo/bar"`           |
+
+Note that the `operator` attribute is **ignored**.
+
+
+
 ## Writing Custom Predicates
 
 ### Overriding `perform_comparison()`
 
-Creating your own predicate is very simple: simply create a `Predicate`
-subclass and implement `perform_comparison()`. A custom predicate to check whether
-one number is a multiple of another could be:
+Creating your own predicate is easy: create a `Predicate`
+subclass and implement `perform_comparison()`. An example custom predicate 
+that checks whether one number is a multiple of another:
 
 
-```python
+```python title="models/predicates/arithmetic_predicates.py"
 from kama_sdk.model.supplier.predicate.predicate import Predicate
 
 class MultiplicityPredicate(Predicate):
@@ -106,47 +161,7 @@ import json
 from kama_sdk.model.supplier.predicate.predicate import Predicate
 
 class JsonChallengePredicate(Predicate):
-  def challenge() -> Dict:
+  def get_challenge() -> Dict:
     raw = super(JsonChallengePredicate, self).check_against()
     return json.loads(raw)
 ```
-
-
-## Attributes
-
-#### `challenge` **required**
-Left hand operand in any binary comparison (see [Operatorss](#operators)) 
-
-#### `check_against`  | default: `None`
-Right hand operand in any binary comparison (see [Operatorss](#operators)) 
-
-#### `operator` | default: `"equals"`
-Binary or unary operator to be used to on `challenge` and/or `check_against (see [Operatorss](#operators)). 
-
-
-#### `negate` | default: `False`
-Flip the original boolean result of the computation. The following would return True:
-```yaml
-kind: Predicate
-operator: truthy
-challenge: null
-negate: true 
-```
-
-#### `early_true_if`, default: `None`
-Provides a shorter alternative to writing nested predicates.
-```yaml
-kind: Predicate
-early_true_if: get::id::another-predicate
-# main logic
-``` 
-
-#### `early_false_if`
-Self explanatory.
-
-
-#### `reason` | default: `None`
-Text to be displayed to the user if this predicate is user-facing.
-
-#### `tone` | default: `error`
-Signals to the user whether or not a negative result is "fatal" or not.
