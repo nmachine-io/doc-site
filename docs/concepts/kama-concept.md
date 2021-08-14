@@ -5,38 +5,30 @@ sidebar_label: KAMA
 
 # Kubernetes Application Management API (KAMA)
 
-The KAMA is your NMachine's brain. Recall that NMachine lets publishers
+The KAMA is your NMachine's backend. Recall that NMachine lets publishers
 **[digitize operational knowledge](/concepts/concepts-root#digitizing-operational-knowledge)**;
 the KAMA is where you encode that knowledge. 
 
-Structurally, the KAMA is an HTTP-based API consumed by the NMachine client. 
+Structurally, the KAMA is an HTTP/JSON API consumed by the NMachine client. 
 It is the backend that computes all the values and performs all
 the work requested by the user via the NMachine client. 
 
 
 
 
-## Building and Shipping a KAMA
+## Building and Shipping an NMachine
 
-As a publisher, you build your KAMA on top of the
-**[KAMA SDK](https://pypi.org/project/kama-sdk-py/)** for Python. When it's ready, you
-create an application definition in the [Publisher Dashboard](https://publish.nmachine.io) 
-that points to it. How and where your KAMA actually runs 
-is explained [here](#where-kama-servers-run). Building a KAMA with the SDK is the focus
-of most of the documentation.
+As a publisher, you build your NMachine on top of the
+**[KAMA SDK](https://pypi.org/project/kama-sdk-py/)**, which is a Django-like open source framework. 
+When it's ready to share, you publish it using the [Publisher Dashboard](https://publish.nmachine.io). 
+How and where your KAMA actually runs is explained [here](#where-kama-servers-run). Building a KAMA 
+with the SDK is the focus of most of the documentation.
 
-Two points on the terminology we use going forward:
-- **"KAMA"**. Depending on the context, may be either a) a running instance
-of a KAMA server, or b) the code you build on the Python KAMA SDK.
-- **"Publisher"**: Depending on the context, may be either a) 
-the company that distributes apps with NMachine, or b) the developer(s) in that company 
-who develop a KAMA using the SDK.
 
-Zooming into the KAMA: 
-
-![](/img/concepts/kama-zoom.jpg)
 
 ## Internal Structure
+
+![](/img/concepts/kama-zoom.jpg)
 
 As shown above, the KAMA has three main parts. The sections below only give a brief introduction;
 dedicated pages are available for each one.

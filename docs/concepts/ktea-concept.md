@@ -22,11 +22,11 @@ it would look like this:
 - **Get default values**: `GET /values`
     - **Output**: YAML/JSON dictionary of all default values (e.g `values.yaml`)
 
-That is all a KTEA is - a protocol for HTTP-based API. The protocol's simplicity
+That is all a KTEA is - a protocol for HTTP/JSON-based API. The protocol's simplicity
 gives NMachine the flexibility to **support any templating engine**. Despite
 Helm's popularity, it's not for everybody; moreover, individual preference around
-templating engines should be a bottleneck to portability. Finally, with HTTP-based
-templating, the end-user does not need to own the templating software, which is good.
+templating engines should be a bottleneck to portability. Finally, remote
+templating makes for one less tool/version the user needs to maintain.
 
 ## Creating your KTEA Servers
 

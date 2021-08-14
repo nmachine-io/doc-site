@@ -29,7 +29,7 @@ source:
 
 Running it:
 
-```python title="$ python3 main.py -m shell"
+```python title="$ python main.py console"
 supplier = MergeSupplier.inflate("my-supplier")
 supplier.resolve()
 # => {'foo': 'strong_foo', 'bar': 'bar'} 
@@ -64,7 +64,7 @@ victim_keys:
 
 Running it:
 
-```python title="$ python3 main.py -m shell"
+```python title="$ python main.py console"
 supplier = MergeSupplier.inflate("my-supplier")
 print(supplier.resolve())
 # => {'foo': {'baz': 'survivor'} } 
@@ -96,7 +96,7 @@ source: get::kind::TruePredicate
 
 Running it:
 
-```python title="$ python3 main.py -m shell"
+```python title="$ python main.py console"
 supplier = IfThenElseSupplier.inflate("my-supplier")
 print(supplier.resolve())
 # => "true is true" 
@@ -138,7 +138,7 @@ predicate:
 
 Running it:
 
-```python title="$ python3 main.py -m shell"
+```python title="$ python main.py console"
 supplier = IfThenElseSupplier.inflate("my-supplier")
 print(supplier.resolve())
 # => [2, 3] 

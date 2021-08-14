@@ -18,38 +18,26 @@ Inspecting `main.py` in **[KAMA Boilerplate](https://github.com/nmachine-io/kama
 ```python main.py
 import os
 
-from kama_sdk import entrypoint
-from kama_sdk.model.base.model import models_man
-from kama_sdk.utils import loading_utils
+from kama_sdk.cli import entrypoint
+from kama_sdk.core.core import plugins_manager
+from kama_sdk.model.base.model import models_manager
+from kama_sdk.utils import descriptor_utils
 
 
-root_dir = os.path.dirname(os.path.abspath(__file__))
+def register_self():
+  root_dir = os.path.dirname(os.path.abspath(__file__))
+  descriptors = descriptor_utils.load_dir_yamls(f'{root_dir}/configs')
+  models_manager.add_descriptors(descriptors)
+  models_manager.add_asset_dir_paths([f'{root_dir}/assets'])
 
-
-def register_own_descriptors():
-  path = f'{root_dir}/descriptors'
-  descriptors = loading_utils.load_dir_yaml_dicts(path, recursive=True)
-  models_man.add_descriptors(descriptors)
-
-
-def register_own_assets():
-  models_man.add_asset_dir_paths([f'{root_dir}/assets'])
-
-
-def register_own_models():
-  path = f'{root_dir}/models'
-  classes = loading_utils.load_dir_model_subclasses(path)
-  print(classes)
-
-
-def register_plugins():
-  pass
+def register_libraries():
+  plugins_manager.register('telem_kaml')
+  plugins_manager.register('prom_kaml')
 
 
 if __name__ == '__main__':
-  register_plugins()
-  register_own_descriptors()
-  register_own_assets()
+  # register_libraries()
+  register_self()
   entrypoint.start()
 ```
 

@@ -3,7 +3,7 @@ sidebar_position: 0
 sidebar_label: Overview
 ---
 
-# Suppliers
+# The `Supplier` Family of Models
 
 A `Supplier` is a special `Model` that performs a computation and 
 _supplies_ the result its parent model. They are a bit like YAML-invokable functions. 
@@ -18,7 +18,7 @@ supply_me_six:
 ``` 
 
 Running it:
-```python title="python3 main.py -m shell"
+```python title="$ python main.py console"
 caller = Model.inflate("parent")
 caller.get_attr("supply_me_six")
 # => 6
@@ -61,7 +61,7 @@ output: ". foo"
 
 Running it:
 
-```python title="$ python3 main.py -m shell"
+```python title="$ python main.py console"
 supplier = Supplier.inflate("my-supplier")
 supplier.resolve()
 # => {'bar': 'baz'}
@@ -85,7 +85,7 @@ output: ". [0].foo"
 ```
 Running it in the KAMA shell:
 
-```python title="$ python3 main.py -m shell"
+```python title="$ python main.py console"
 supplier = Supplier.inflate("my-supplier")
 print(supplier.resolve())
 # => [{'bar': 'baz'}]
@@ -120,7 +120,7 @@ output:
   private_address: "internal_ip"
 ```
 
-```python title="$ python3 main.py -m shell"
+```python title="$ python main.py console"
 supplier = Supplier.inflate("my-supplier")
 print(supplier.resolve())
 # => {'public_address': None, 'private_address': '10.40.7.144'}

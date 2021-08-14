@@ -22,7 +22,7 @@ check_against: 4
 
 Running it:
 
-```python title="python3 main.py -m shell"
+```python title="$ python main.py console"
 predicate = Predicate.inflate('my-predicate')
 predicate.resolve()
 # => True

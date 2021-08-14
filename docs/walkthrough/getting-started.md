@@ -9,7 +9,7 @@ sidebar_label: "Getting Started"
 
 **Objective**. Learn **[KAMA](/concepts/kama-concept)** development by writing a
 simple KAMA for a simple, pre-built app 
-([Ice Kream 🍦](https://github.com/nmachine-io/playground/tree/master/ice-cream/app)). 
+([Ice Kream 🍦](https://github.com/nmachine-io/playground/tree/master/ice-kream)). 
 Make sure you've seen the demo video; this walkthrough is more or less structured around
 how to build each page in the app.
 
@@ -19,7 +19,7 @@ how to build each page in the app.
 1. Docker and `git`.
 
 **Non-Objectives**:
-1. Publishing our NMachine to the App Store. For that, [go here](/tutorials/publishing-tutorial.md).
+1. Publishing our NMachine to the App Store. For that, read the [publishing tutorial](/tutorials/publishing-tutorial.md).
 1. Developing the underlying app, its Helm chart, or its [KTEA](/tutorials/helm-to-ktea-tutorial).
 
 
@@ -29,66 +29,97 @@ how to build each page in the app.
 ## Step 1: Create the Project
 
 Clone the [`kama-boilerplate`](https://github.com/nmachine-io/kama-boilerplate) 
-project into your workspace and rename it to `ice-kream`:
+project into your workspace, rename it to `ice-kream`, and install the SDK.
 
 ```shell script
 git clone git@github.com:nmachine-io/kama-boilerplate.git
 mv kama-boilerplate ice-cream-kama
 cd ice-cream-kama
+pipenv install #adjust to your env manager
 ```
 
-Take note of the directory structure:
+Start the **[KAMA Interactive Console](/tutorials/kama-console-tutorial)** 
+and make sure the following two statements return coherent values:
 
-```
-ice-cream-kama
-└───assets/
-└───descriptors/
-└───models/ 
-│   main.py
-│   Dockerfile
-│   Pipfile
-```
-
-
-
-
-
-## Step 2: Hello KAMA Interactive Shell
-
-We want to make sure that 1) there are no problems 
-with the SDK and its depenencies, and 2) your Kubernetes cluster is reachable.
-It is strongly recommended you use an environment manager for Python like `pipenv`.
-Begin by installing the dependencies:
-
-```shell script
-# using pipenv
-pipenv install
-```
-
-Run the **[KAMA Interactive Shell](/tutorials/kama-shell-tutorial)** from your
-project root:
-
-```shell_script
-python3 main.py -m shell
-```
-
-Then, run the following two commands in the shell:
-
-```python title="python3 main.py -m shell"
+```python title="$ python main.py console"
 Model.inflate({'title': "Hello World"}).get_title()
 # => Hello World
-
 [ns.name for ns in KatNs.list()]
 # => ['default', 'kube-public', 'kube-system']
 ```
 
-If you noticed any Kubernetes-like errors when the shell started, or if
-`KatNs.list()` failed, the 
+To troubleshoot or configure your Kubernetes connection, read the 
 [Connecting to Kubernetes with K8Kat tutorial](/tutorials/k8kat-essentials).
 
 
 
-## Step 3: Hello KTEA (Optional)
+
+
+
+## Step 2: Initialize a mock NMachine
+
+With the SDK installed, we can create a 
+Kubernetes namespace with a [Master ConfigMap](/concepts/state-concept.md), which
+is the sole resource an NMachine needs to manage an app. For now, we'll use the handy
+`mock-install <namespace>` utility to mock one; we'll graduate to making real ones later
+on in the tutorial. Issue the following:
+
+
+```shell script
+python main.py mock-install ice-kream
+# => [kama_sdk] created configmap/master in namespace ice-kream
+# take a look around the configmap
+```
+
+Next, let's populate the ConfigMap's `default_vars` with the contents of our
+templating engine's `values.yaml`. We'll use a pre-built 
+**[KTEA](/concepts/ktea-concept)** that's available at 
+[api.nmachine.io/ktea/ice-kream/1.0.1](https://api.nmachine.io/ktea/ice-kream/1.0.1).
+Your Master ConfigMap should already be pointing to it; make sure
+by inspecting the output of `config_man.get_ktea_config()` from the console.
+
+Now, to populate `default_vars`: 
+
+```python title="$ python main.py console"
+defaults = ktea_client().load_default_values()
+config_man.write_default_mvariables(defaults)
+```
+
+The return value of `config_man.get_default_mvariables()` should be
+equal to the `values.yaml` in the 
+[source code](https://github.com/nmachine-io/playground/blob/master/ice-kream/ice-kream-ktea/values/values.yaml.erb).
+
+
+
+
+
+## Step 3: See our NMachine in the Desktop Client
+
+
+First, install [the NMachine Desktop Client](/nope), make sure it launches, and that it sees
+your relevant Kuberenetes contexts (Kubernetes logo in the bottom left corner).
+
+
+Next start the **server & worker** processes from the SDK. From your project's root, run **two terminals**:
+
+```shell script title="terminal #1"
+python3 main.py server
+# [kama_sdk] KAMA server started (namespace=ice-kream)
+``` 
+
+```shell script title="terminal #2"
+python3 main.py worker
+# [kama_sdk] KAMA worker started (namespace=ice-kream)
+``` 
+
+![](/img/walkthrough/client-dev-flow-1.png)
+
+
+
+
+
+
+## Optional: Reflect on our Actions
 
 A **[KTEA (Kubernetes Templating Engine API)](/concepts/ktea-concept)** 
 lets you serve a templating engine (like Helm) over HTTP/JSON. 
@@ -120,30 +151,3 @@ kubectl port-forward svc/app 80:8080 -n ice-cream-test
 
 Ensure the app is running: [localhost:8080](http://localhost:8080). Clean up by deleting
 our temporary namespace: `kubectl delete ns/ice-kream-test`.
-
-
-
-
-
-## Step 4: Hello NMachine Client
-
-**Start the Server & Worker Processes**. From your project root, open two terminals and enter:
-
-```shell script
-python3 main.py # from one terminal
-python3 main.py -m worker # from the other terminal
-``` 
-
-**Download and install the [NMachine Client](https://www.nmachine.io/client)**. 
-
-Start the client and click the "tools" icon on the left. You should see the following.
-
-![](/img/walkthrough/client-dev-flow-1.png)
-
-Fill out the form as follows:
-- **KTEA Type**: Static Server
-- **KTEA URI**: thing
-- **KAMA Type**: Local Server
-- **KAMA URI**: http://localhost:5000
-
-Then, click through the steps until the NMachine is installed.

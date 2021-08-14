@@ -44,7 +44,7 @@ def register_own_descriptors():
 ## Right Answer: Python = Efficient Development
 
 **Feedback Loop**. You can dramatically tighten your development feedback loop
-(e.g code, see result) by testing your models in the [Interactive Shell](/tutorials/kama-shell-tutorial) 
+(e.g code, see result) by testing your models in the [Interactive Shell](/tutorials/kama-console-tutorial) 
 before running them in NMachine client. 
 
 **Debugging**. Inside the Interactive Shell, you can inspect model attributes,
