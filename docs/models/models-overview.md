@@ -11,8 +11,11 @@ objects and processes in the Kubernetes/DevOps universe.
 a multitude of models, which you, as a publisher, create instances of 
 using descriptors, giving your NMachine its behavior. 
 
-Models are a large topic; this page introduces the main ideas and links
-to more in depth material when necessary. The picture below should help you build an intuition
+Models are a large topic; this page introduces the main concepts and links
+to more in depth material when necessary. The majority of the material
+relates to the special tricks Models use to.
+
+The picture below should help you build an intuition
 for how the models you write map onto the NMachine your users see.
 
 <p align="center">
@@ -79,6 +82,35 @@ table below for quick access.
 ### Prebuilt Descriptors 
 
 
+## Inheriting from Other Descriptors
+
+Of the special Model mechanisms covered on this page, descriptor inheritance 
+is the simplest. If you have two descriptors `d1` and `d2`, if `d2` declares `inherit: d1`,
+then **`d1` will get deep merged into `d2` when loaded**. Illustration:
+
+```yaml
+kind: Model
+id: d1
+title: "D1 title"
+foo: "foo"
+---
+kind: Model
+id: d2
+inherit: d1
+info: "D2 info"
+foo: "bar"
+```
+
+Testing out the merging rules:
+
+```python title="$ python main.py console"
+d2 = Model.inflate("d2")
+(d2.get_title(), d2.get_info(), d2.get_attr("foo"))
+("D1 title", "D2 info", "bar")
+# => 
+```
+
+
 ## Expressing Model Associations in Descriptors 
 
 Many prebuilt models have **belonging relationships** with other models. These will
@@ -127,7 +159,10 @@ id: "child-one"
 ```
 
 
-## Supplying Dynamic Values in Descriptors
+
+
+
+## Supplying Dynamic Attribute Values in Descriptors
 
 The biggest difference between descriptors in KAMA and Kubernetes is templating.
 Kubernetes is purely declarative: once you submit a resource descriptor with `kubectl apply`,
@@ -173,10 +208,30 @@ Again, this topic requires some investment; make sure put the
 
 
 
+## Caching and Overriding Attributes 
 
+We just saw that attribute _values_ can be dynamic. In addition to this, 
+we can can also nest attributes in special places for special purposes, namely
+caching and redefining inherited attributes. 
 
+We only introduce the concept here; for the complete description, read the 
+**[Attribute Lookup Pipeline Guide]**.
 
+To build up an intution, consider a hypothetical example for the caching case, 
+where a Predicate needs to compute a pod count only once but needs to use 
+it twice: 
 
-## Customizing the Attribute Lookup Logic 
+```yaml
+kind: Predicate
+id: "demo.ensure-no-pods"
+challenge: get::self>>pod_replica_counts 
+check_against: 0
+reason: "There were unexpectedly {get::self>>pod_replica_counts} pods remaining"
+cache:
+  pod_replica_counts: 
+    kind: ResourceSupplier
+    output: "| .count"
+    resource_selector: {res_kind: Pod}
+```
 
 
