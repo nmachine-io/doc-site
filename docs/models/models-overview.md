@@ -23,7 +23,7 @@ for how the models you write map onto the NMachine your users see.
 </p>
 
 
-## You Write Model Descriptors in YAML
+## Writing Model Descriptors in YAML
 
 You declare instances of Models the same way you declare Kubernetes resources: 
 by writing descriptors, usually in YAML. How you register models is covered  in the 
@@ -84,19 +84,19 @@ table below for quick access.
 
 ## Inheriting from Other Descriptors
 
-Of the special Model mechanisms covered on this page, descriptor inheritance 
+Of the Model mechanics covered on this page, descriptor inheritance 
 is the simplest. If you have two descriptors `d1` and `d2`, if `d2` declares `inherit: d1`,
-then **`d1` will get deep merged into `d2` when loaded**. Illustration:
+then **`d1` will get deep merged into `d2` when loaded**: 
 
 ```yaml
 kind: Model
-id: d1
+id: "d1"
 title: "D1 title"
 foo: "foo"
 ---
 kind: Model
-id: d2
-inherit: d1
+id: "d2"
+inherit: "d1"
 info: "D2 info"
 foo: "bar"
 ```
@@ -162,7 +162,7 @@ id: "child-one"
 
 
 
-## Supplying Dynamic Attribute Values in Descriptors
+## Computation Inside Descriptors
 
 The biggest difference between descriptors in KAMA and Kubernetes is templating.
 Kubernetes is purely declarative: once you submit a resource descriptor with `kubectl apply`,
@@ -183,10 +183,10 @@ can go the **[Python-maximalist](/nope)** route instead.
 :::
 
 
-### The Functional Model: `Supplier`
+### Performing the Computations: `Supplier`
 
 A `Supplier` is a special `Model` subclass that gets treated 
-**as an invokable function** when encountered in descriptor tree. It is important you
+**as an invokable function** when read in a descriptor. It is important you
 read through the **[Supplier Documentation](/models/suppliers/supplier-overview)** 
 over the course of your KAMA development journey. 
 

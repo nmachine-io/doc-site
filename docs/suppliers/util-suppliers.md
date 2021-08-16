@@ -3,7 +3,7 @@ sidebar_label: Utilities
 sidebar_position: 1
 ---
 
-# Utility Suppliers
+# Prebuilt Utility Suppliers
 
 The following `Supplier` subclasses perform boilerplate computations
 found in most functional programming languages.
@@ -13,27 +13,18 @@ found in most functional programming languages.
 
 ## MergeSupplier
 
-Merges the list of `dict` it receives as input.
-
-Example:
+Merges the list of `dict` it receives as input. Example:
 
 ```yaml
 kind: MergeSupplier
 id: "my-supplier"
 source:
-  - foo: "weak_foo"
-    bar: "bar"
+  - {foo: "weak_foo", bar: "bar"}
   - foo: "strong_foo"
-    bar: "bar"
 ```
 
-Running it:
+Yields `{'foo': 'strong_foo', 'bar': 'bar'}`.
 
-```python title="$ python main.py console"
-supplier = MergeSupplier.inflate("my-supplier")
-supplier.resolve()
-# => {'foo': 'strong_foo', 'bar': 'bar'} 
-```
 
 ### Attributes Table
 
@@ -48,27 +39,20 @@ supplier.resolve()
 
 ## UnsetSupplier
 
-Given a `dict` and a list of victim keys, returns the original dict 
-without the victim keys:
+Given a `dict` and a list of victim keys, returns the original dict without the victim keys:
 
 ```yaml
 kind: UnsetSupplier
 id: "my-supplier"
 source:
-  foo:
-    bar: "victim"
-    baz: "survivor"
+  foo: {bar: "victim"}
+  baz: "survivor"
 victim_keys: 
   - "foo.bar"
 ```
 
-Running it:
+Yields `{'foo': {'baz': 'survivor'}}`.
 
-```python title="$ python main.py console"
-supplier = MergeSupplier.inflate("my-supplier")
-print(supplier.resolve())
-# => {'foo': {'baz': 'survivor'} } 
-```
 
 ### Attributes Table
 
@@ -89,26 +73,20 @@ Conditionally returns one value or another depending on the _truthiness_ of `sou
 ```yaml
 kind: IfThenElseSupplier
 id: "my-supplier"
-if_true: "true is true"
-if_false: "true is false"
-source: get::kind::TruePredicate
+on_true: "true is true"
+on_false: "true is false"
+predicate: kind::TruePredicate
 ```
 
-Running it:
-
-```python title="$ python main.py console"
-supplier = IfThenElseSupplier.inflate("my-supplier")
-print(supplier.resolve())
-# => "true is true" 
-```
+Yields `"true is true"`.
 
 ### Attributes Table
 
 | Key                   | Type   | Cached? | Lookback | Notes                                                                    |
 |-----------------------|--------|---------|----------|--------------------------------------------------------------------------|
-| `source` **required** | `bool` | No      | No       | The conditional. Most likely a an expression to resolve to a `Predicate` |
-| `if_true`             | `Any`  | No      | No       | What to return if `source` evaluates to a truthy value                   |
-| `if_false`            | `Any`  | No      | No       | What to return if `source` evaluates to a falsy value                    |
+| `predicate` **required** | `Predicate` | No      | No       | The `Predicate` that will be inflated and resolved  |
+| `on_true`             | `Any`  | No      | No       | What to return if `predicate` evaluates to a truthy value                   |
+| `on_false`            | `Any`  | No      | No       | What to return if `predicate` evaluates to a falsy value                    |
 
 
 
@@ -118,12 +96,12 @@ print(supplier.resolve())
 ## ListFilterSupplier
 
 Conceptually identical to `filter` in popular functional programming languages. Given 
-a `Predicate` and a list, returns the list filtered by items
-for which, when given as input to the predicate, made the predicate evaluate to true. 
+a `Predicate` and a list, returns only the list item for which the `predicate` 
+resolved to a truthy value. 
 
-This works by patching the `predicate` with a `subject` attribute that holds the value
-of the item currently being looked at. 
-
+The `ListFilterSupplier` works by iterating over the list, and for each item,
+patching the `predicate` with a `subject` attribute that holds the value of the 
+current item.
 
 ```yaml
 kind: ListFilterSupplier
@@ -136,19 +114,14 @@ predicate:
   operator: ">"
 ```
 
-Running it:
+Yields `[1, 2]`.
 
-```python title="$ python main.py console"
-supplier = IfThenElseSupplier.inflate("my-supplier")
-print(supplier.resolve())
-# => [2, 3] 
-```
 
 ### Attributes Table
 
-| Key                   | Type        | Cached? | Lookback | Notes                                                                                                                                  |
+| Key                   | Type        | Cached? | Notes |
 |-----------------------|-------------|---------|----------|----------------------------------------------------------------------------------------------------------------------------------------|
-| `source` **required** | `List`      | No      | No       | A list of anything                                                                                                                     |
+| `source` **required** | `List`      | No      | No       | Any list                                                                                                                     |
 | `predicate`           | `Predicate` | N/A     | N/Aa     | Reference to the `Predicate` that will act as the filter on each item in `source`. Will be inflated `subject` set to the current item. |
 
 

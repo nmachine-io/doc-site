@@ -11,11 +11,11 @@ During development, the KAMA Interactive Python Console will be your wingman.
 Conceptually, it's identical to the likes of Rails' `rails c` and Django's `manage.py`.
 
 Inside the console, you can access the entire SDK as well as your registered descriptors and custom
-classes. This is useful for efficiently introspecting your models, testing your 
-[Suppliers](/models/suppliers/supplier-overview) / 
-[Predicates](/models/predicates/predicates-base) / 
-[Actions](/models/actions/action-base),
-and generally getting comfortable with the KAMA SDK. 
+classes. You should use the console as first point of contact for evaluating your work. It's 
+much faster to debug and introspect your models through the console than through the desktop client. 
+
+
+
 
 ## Starting the Console
 
