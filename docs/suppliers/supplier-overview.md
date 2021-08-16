@@ -337,33 +337,9 @@ made for the sake of readability.
 
 
 
-## Preventing Resolution with `&`
 
-You will sometimes need to pass a Supplier _itself_ to an attribute, rather than 
-the value it resolves to. This is akin to passing a function reference in normal 
-programming languages.
 
-To do this, add `"&"` in front of your `id::` or `kind::` reference. For instance:
 
-```yaml
-kind: Supplier
-id: "delayed_gratification"
-soruce: "delayed gratification"
----
-kind: Model
-id: "parent"
-supplier_itself: "get::&id::delayed_gratification" 
-```
-
-As expected, getting `supplier_itself` gives us an instance of `Supplier` inflated with
-the `delayed_gratification` descriptor.
-
-```python title="$ python main.py console"
-parent = Model.inflate("parent")
-supplier = parent.get_attr("delayed_gratification")
-type(supplier), supplier.resolve()
-# => (Supplier, "delayed gratification")
-```  
 
 
 ## Suppliers inside Lists
@@ -385,6 +361,14 @@ supplier.resolve()
 # => []
 ```  
 
+:::info Dicts in Lists?
+Check out the next section. If your list items are Dicts, you'll need to use `depth=`.  
+:::
+ 
+ 
+ 
+ 
+ 
  
 ## Suppliers inside Dicts 
 
@@ -433,6 +417,51 @@ parent.get_attr("nesting", depth=100)
 Each model knows which attributes _ought to be_ Dicts, so it's their job to use
 `depth=`. Assuming you don't write custom models, the only time you will use this is
 when debugging your models in the console. 
+
+
+
+
+
+
+
+
+
+
+## Preventing Resolution with `&`
+
+You will sometimes need to pass a Supplier _itself_ to an attribute, rather than 
+the value it resolves to. This is akin to passing a function reference in normal 
+programming languages.
+
+To do this, add `"&"` in front of your `id::` or `kind::` reference. For instance:
+
+```yaml
+kind: Supplier
+id: "delayed_gratification"
+soruce: "delayed gratification"
+---
+kind: Model
+id: "parent"
+supplier_itself: "get::&id::delayed_gratification" 
+```
+
+As expected, getting `supplier_itself` gives us an instance of `Supplier` inflated with
+the `delayed_gratification` descriptor.
+
+```python title="$ python main.py console"
+parent = Model.inflate("parent")
+supplier = parent.get_attr("delayed_gratification")
+type(supplier), supplier.resolve()
+# => (Supplier, "delayed gratification")
+```  
+
+
+
+
+
+
+
+
 
 
 
