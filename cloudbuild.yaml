@@ -1,0 +1,95 @@
+timeout: 900s
+
+images:
+  - "us-central1-docker.pkg.dev/$PROJECT_ID/private/doc-site:latest"
+
+substitutions:
+  _IMG_BASE: "us-central1-docker.pkg.dev/nectar-bazaar/private/doc-site"
+  _TEMPLATER: "us-central1-docker.pkg.dev/nectar-bazaar/private/doc-site-ktea:1.0.0"
+
+steps:
+  - id: "Pull templater"
+    name: "gcr.io/cloud-builders/docker"
+    args: ["pull", "${_TEMPLATER}"]
+    waitFor: []
+
+  - id: "Pull previous doc-site image"
+    name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |-
+        docker pull ${_IMG_BASE}:latest || exit 0
+    waitFor: []
+
+  - id: "Build Image"
+    name: "gcr.io/cloud-builders/docker"
+    waitFor:
+      - "Pull previous doc-site image"
+    args:
+      - build
+      - "."
+      - "--cache-from"
+      - "${_IMG_BASE}:latest"
+      - "-t"
+      - "${_IMG_BASE}:${SHORT_SHA}"
+      - "-t"
+      - "${_IMG_BASE}:latest"
+
+  - id: "Push Image"
+    name: "gcr.io/cloud-builders/docker"
+    waitFor:
+      - "Build Image"
+    args:
+      - "push"
+      - "${_IMG_BASE}:${SHORT_SHA}"
+
+  - id: "Commit Values"
+    name: "${_TEMPLATER}"
+    waitFor:
+      - "Pull templater"
+    args:
+      - ruby
+      - main.rb
+      - state
+      - patch
+      - "-n"
+      - "doc-site"
+      - "--set"
+      - "monolith.image=${_IMG_BASE}:${SHORT_SHA}"
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=prod'
+
+  - id: "Generate Manifest"
+    name: "${_TEMPLATER}"
+    waitFor:
+      - "Commit Values"
+    entrypoint: bash
+    args:
+      - "-c"
+      - |-
+        cd /templater; ./init.sh;
+        manifest=$(ruby main.rb state template doc-site -n doc-site -e production);
+        echo "$manifest" > /workspace/manifest.yaml
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=prod'
+
+  - id: "Print Manifest"
+    name: "bash"
+    waitFor: ["Generate Manifest"]
+    args: ["cat", "/workspace/manifest.yaml"]
+
+  - id: "Deploy in Cluster"
+    name: 'gcr.io/cloud-builders/kubectl'
+    waitFor:
+      - "Generate Manifest"
+      - "Push Image"
+    args:
+      - "apply"
+      - "-f"
+      - "manifest.yaml"
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=prod'

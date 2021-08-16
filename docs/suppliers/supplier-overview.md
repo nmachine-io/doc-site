@@ -310,7 +310,9 @@ child:
   title: "I am ${get::parent>>title}'s child"
 ``` 
 
-
+Notice the use of `>>`. If you've read the syntactic sugar section, you should
+know that `>>` is the alias for the `model` serializer. This makes sense because
+as we just said, `self` and `parent` return models instances.
 
 ## Nesting Suppliers
 
@@ -362,11 +364,33 @@ supplier = parent.get_attr("delayed_gratification")
 type(supplier), supplier.resolve()
 # => (Supplier, "delayed gratification")
 ```  
- 
- 
-## Understanding Recursion 
 
-### Default Behavior is Non-Recursive
+
+## Suppliers inside Lists
+
+When an attribute's value's type is a List, each item gets supplier-resolved.
+
+```yaml
+kind: Model
+id: "parent"
+strings:
+  - kind::RandomStringSupplier
+  - kind::RandomStringSupplier
+``` 
+
+```python title="$ python main.py console"
+parent = Model.inflate("parent")
+supplier = parent.get_attr("strings")
+supplier.resolve()
+# => []
+```  
+
+ 
+## Suppliers inside Dicts 
+
+What happens when your supplier is _inside_ a Dict?
+
+### The Default Behavior is Non-Recursive
 
 By default, attribute resolution is **not recursive**. The resolution engine
 will try to resolve scalars and lists, as we have seen, but if it gets
@@ -382,6 +406,7 @@ nesting:
   separation: 
     kind: Supplier
     id: "will-not-get-resolved"
+    source: "foo"
 ```
 
 In this example, when we try to resolve `nesting`, the resolution 
@@ -394,7 +419,21 @@ parent.get_attr("nesting")
 ```
 
 
-### Forcing Recursive Resolution with `depth=X`
+### Forcing Recursive Resolution with `depth=`
+
+To force attribute resulution inside a Dict, you need to pass `depth=<X>`. Using
+the descriptor from the last example, we can get `nesting` to full resolve as follows:
+
+```python title="$ python main.py console" {2}
+parent = Model.inflate("parent")
+parent.get_attr("nesting", depth=100)
+# => {'nesting': {'separation': 'foo'}}
+```
+
+Each model knows which attributes _ought to be_ Dicts, so it's their job to use
+`depth=`. Assuming you don't write custom models, the only time you will use this is
+when debugging your models in the console. 
+
 
 
 ## Outputting Model Descriptors from Suppliers
