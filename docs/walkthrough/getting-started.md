@@ -11,7 +11,7 @@ sidebar_label: "Getting Started"
 simple KAMA for a simple, pre-built app. 
 Make sure to watch the [demo video](/) as this walkthrough is more or less structured around
 how to build each page. We will start with the nearly empty [boilerolate KAMA](/nope) and 
-finish with a functional [Ice Kream 🍦](https://github.com/nmachine-io/playground/tree/master/ice-kream)
+finish with a functional [Ice Kream 🍦](https://github.com/nmachine-io/mono/tree/master/ice-kream)
 store you can share with your friends.
 
 **Requirements**. 

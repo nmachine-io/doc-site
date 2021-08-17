@@ -42,6 +42,10 @@ when you call `<ModelSubclass>.inflate(<descriptor>)`,
 
 ## Inflating by Special Expression
 
+## Inheriting from another Descriptor
+
+## Patching
+
 
 ## Type Inference 
 

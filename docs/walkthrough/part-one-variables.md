@@ -3,19 +3,37 @@ sidebar_position: 1
 sidebar_label: Variables Page
 ---
 
+
+
+
+
+
 # Part 1: The Manifest Variables Page 
 
 The importance of manifest variables cannot be overstated for chart-based Kubernetes apps.
 Let's make Ice Kream's manifest variables a no-brainer to configure for our NMachine's end user. 
-We will model **five manifest variables** with a mix of:
+
+
+We will fully model one variable - `monolith.deployment.replicas` - to cover the principles
+you'll need to model your own variables. Find all final variables descriptors for 
+[Ice Kream 🍦](https://github.com/nmachine-io/mono/tree/master/ice-kream) in the 
+[Github repo](https://github.com/nmachine-io/mono/tree/master/ice-kream/ice-kream-kama/descriptors/variables).
+
+The game plan:
+1. **Model** itself
 1. **Inputs** validations
 1. **Dependency** relations
 1. **Health checks**
 1. **Error remediations**
 
-Before continuing, you need to understand how the KAMA thinks about manifest variables; 
-read the [KTEA Concept Overview](/concepts/ktea-concept) if you haven't already. Also,
-to make things more concrete, take a look at the _actual_ manifest variables we will be working with:
+
+
+
+Make sure you understand how the KAMA thinks about manifest variables
+by reading the [KTEA Concept Overview](/concepts/ktea-concept). Additionally,
+have a look at the values our 
+[templating engine](https://github.com/nmachine-io/mono/tree/master/ice-kream/ice-kream-ktea)
+produces:
 
 ```bash
 curl https://api.nmachine.io/ktea/nmachine/ice-kream-ktea/1.0.1/values | jq
@@ -29,9 +47,11 @@ source code [on GitHub](https://github.com/nmachine-io/mono/tree/master/ice-krea
 
 
 
+
+
 ## 1. Bare Minimum `ManifestVariable`
 
-Like any good Kubernetes tutorial we'll start with replicas. Let's create the
+Like any good Kubernetes tutorial, we'll start with replicas. Let's create the
  bare minimum **[ManifestVariable](/models/variables/manifest-variables)** descriptor:
 
 ```yaml title="descriptors/variables/deployment"
@@ -44,17 +64,23 @@ in the [Master ConfigMap](/nope). If `flat_key` is missing, `id` is used instead
 We can start building an intuition for `ManifestVariable`:
 
 ```python title="$ python main.py console"
-replicas_var = ManifestVariable.inflate("monolith.deployment.replicas")
-replicas_var.get_default_value()
-# => 1
-replicas_var.get_current_value()
-# => 1
-config_man.patch_user_vars({"monolith.deployment.replicas": 3})
-replicas_var.get_current_value()
-# => 3
-replicas_var.get_default_value()
-# => 1
+>>> replicas_var = ManifestVariable.inflate("monolith.deployment.replicas")
+>>> replicas_var.get_default_value()
+1
+>>> replicas_var.get_current_value()
+1
+>>> config_man.patch_user_vars({"monolith.deployment.replicas": 3})
+>>> replicas_var.get_current_value()
+3
+>>> replicas_var.get_default_value()
+1
+>>> 
 ```
+
+
+
+
+
 
 
 ## 2. Adding Metadata
@@ -65,10 +91,153 @@ we can add basic metadata, which is very easy to do. Let's update our model:
 ```yaml title="descriptors/variables/deployment"
 kind: ManifestVariable
 id: "monolith.deployment.replicas"
-title: "Application fixed replica count"
+category: "id::sdk.variable-category.compute"
+title: "Website Replica Count"
+info: "Number of Kubernetes Pod replicas the Ice-Kream store should have. Each replica can cost up to 80Mb of memory and 200 CPU millicores. One replica is enough for ~200 concurrent users. If you expect traffic to fluctuate, you may want to consider enabling the Pod AutoScaler."
 ```
 
+Let's look at our variable in the desktop client:
+
+![](/img/walkthrough/var-one.png)
+
+What happened here is fairly obvious except for `id::sdk.variable-category.compute` - our first 
+**[model association](/models/models-overview#expressing-model-associations-in-descriptors)**, 
+which is to [VariableCategory](/models/variables/variable-category.md).
 
 
-## Adding User Input
 
+## 3. Adding User Input
+
+We can make one last usability improvement for users by adding a more atuned
+input type for the variable. Discover the supported input types in the 
+**[Inputs Guide](/models/variables/input)**. We'll use a 
+[`SliderInput`](/nope) that goes from 0 to 15:
+
+```yaml title="descriptors/variables/deployment"
+kind: ManifestVariable
+id: "monolith.deployment.replicas"
+category: "id::sdk.variable-category.compute"
+title: "Website Replica Count"
+info: "Number of Kubernetes Pod replicas the Ice-Kream store should have. Each replica can cost up to 80Mb of memory and 200 CPU millicores. One replica is enough for ~200 concurrent users. If you expect traffic to fluctuate, you may want to consider enabling the Pod AutoScaler."
+input:
+  kind: SliderInput
+  min: 0
+  max: 15
+```
+
+Our desktop client shows now shows a slider:
+
+![](/img/walkthrough/var-two.png)
+
+
+
+
+
+
+## 4. Validating User Input
+
+As part of our effort to digitize operational knowledge, we should prevent user errors before they happen. 
+Let's warn the user of suspicious values for `monolith.deployment.replicas`.
+To do this, we turn to a new Model - the **[`Predicate`](/models/predicates/predicates-base)**. Our first
+predicate will make sure that `replicas > 0`:
+
+```yaml title="descriptors/variables/helpers"
+kind: Predicate
+id: app.predicate.mono-replicas-non-zero
+reason: "Zero replicas will take the website down. Make sure this is temporary."
+operator: "greater-than"
+check_against: 0
+```
+
+Let's test our descriptor out by inflating and 
+**[patching](/tutorials/inflating-models-tutorial#patching)** its `challenge` attribute:
+
+```python
+>>> pred = Predicate.inflate("app.predicate.mono-replicas-non-zero")
+>>> pred.patch({'challenge': 4}).resolve()
+True
+>>> pred.patch({'challenge': 0}).resolve()
+False
+```
+
+Now, let's point our variable to our new predicate: 
+
+```yaml title="descriptors/variables/deployment"
+kind: ManifestVariable
+id: "monolith.deployment.replicas"
+# ...
+validators:
+  - "id::app.predicate.mono-replicas-non-zero"
+```
+
+What's happening here? Every time the user moves the slider, 
+your `monolith.deployment.replicas` model gets inflated, then its
+child `validators` get inflated and 
+[patched](/tutorials/inflating-models-tutorial#patching) with `challenge: <value from user input>`.
+
+We can see this in action with the incoming HTTP requests:
+
+![](/img/walkthrough/validation.gif)
+
+
+
+
+
+
+## 5. Modelling a Dependency 
+
+Manifest variables are often related to one another, and failing to understand these relationships
+can be a source of problems. The KAMA lets you express variable-to-variable relationships with the the 
+**[`ManifestVariableDependency` model](/models/variables/manifest-variable-dependency)**.
+
+Let us model the following common dependency: _a deployment's hardcoded `replcas` amount is ignored
+when an associated HPA 
+([HorizontalPodAutoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/))
+is present_.
+
+First, we have to create the new HPA variable:
+
+```yaml
+kind: ManifestVariable
+id: "monolith.deployment.hpa.enabled"
+#...
+```
+
+Next, let's write the dependency:
+
+```yaml
+kind: ManifestVariableDependency
+id: "app.variable-dep.hpa_true_prevents_read_replicas"
+title: "Your hardcoded website's pod replica count is ignored because your HPA (Horizontal Pod Auto-scaler) is enabled."
+from: ["id::monolith.deployment.hpa.enabled"]
+to: ["id::monolith.deployment.replicas"]
+effect: "prevents_read"
+active_condition:
+  kind: Predicate
+  challenge: "get::self>>from_variable>>current_value"
+  operator: true
+```
+
+Now, to test it in the console:
+
+```python
+>>> config_man.patch_user_vars({"monolith.deployment.hpa.enabled": False})
+>>> replicas_var = ManifestVariable.inflate("monolith.deployment.replicas")
+>>> replicas_var.effects_felt()
+[]
+>>> config_man.patch_user_vars({"monolith.deployment.hpa.enabled": True})
+>>> replicas_var.effects_felt()
+['prevents_read']
+```
+
+Checking the desktop client, you'll notice this has several manifestations, one of
+which is that our `monolith.deployment.replicas` variable is now crossed out:
+
+![](/img/walkthrough/var-barred.png)
+
+
+## 6. Health Checks
+
+Sometimes, shift happens, and problematic values do get assigned to variables. To 
+that end, we can define permanent health checks for individual variables. We'll use
+a list of `Predicate` descriptors again, but this time, we'll 
