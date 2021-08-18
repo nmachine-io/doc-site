@@ -165,7 +165,7 @@ id: "child-one"
 ## Computation Inside Descriptors
 
 The biggest difference between descriptors in KAMA and Kubernetes is templating.
-Kubernetes is purely declarative: once you submit a resource descriptor with `kubectl apply`,
+In Kubernetes, once you submit a resource descriptor with `kubectl apply`,
 its attributes are forever taken at face value. You can't say 
 things like `replicas: <number_of_nodes + 1>`.
 
@@ -174,20 +174,19 @@ specific user-initiated requests; **they are expected to use information
 in the current context to modulate their behavior**. 
 
 The semantics of dynamic value resolution represent the steepest learning curve
-in KAMA development, but provide you with the tremendous expressive power necessary
-to efficiently model even the most complex Kubernetes operational knowledge. 
+in KAMA development, but provide you with tremendous expressive power.
 
-:::info YAML Minimalist?
+<!-- :::info YAML Minimalist?
 If you don't like the idea of computation in YAML, you 
 can go the **[Python-maximalist](/nope)** route instead.
 :::
-
+ -->
 
 ### Performing the Computations: `Supplier`
 
 A `Supplier` is a special `Model` subclass that gets treated 
 **as an invokable function** when read in a descriptor. It is important you
-read through the **[Supplier Documentation](/models/suppliers/supplier-overview)** 
+read through the **[Supplier Documentation](/suppliers/supplier-overview)** 
 over the course of your KAMA development journey. 
 
 For now, we can build up a quick intuition with a (nearly) real world example - 
@@ -204,24 +203,26 @@ challenge:
 ```
 
 Again, this topic requires some investment; make sure put the 
-**[Supplier Documentation](/models/suppliers/supplier-overview)** on your reading list.
+**[Supplier Documentation](/suppliers/supplier-overview)** on your reading list.
 
 
 
-## Caching and Overriding Attributes 
+## The Attribute Lookup Pipeline
 
 We just saw that attribute _values_ can be dynamic. In addition to this, 
-we can can also nest attributes in special places for special purposes, namely
-caching and redefining inherited attributes. 
+`Model` also has a language of special clauses and escape codes that let
+you do things like caching and self-referential attribute redefinition. 
+This is called the **[Attribute Lookup Pipeline](/tutorials/lookup-pipline-tutorial)**
 
-We only introduce the concept here; for the complete description, read the 
-**[Attribute Lookup Pipeline Guide]**.
+This is another topic that requires one's full attention, so make sure to read
+the full guide. For now, the snippet below should help you build an intuition;
+it demonstrates how an expensive `Supplier` is marked for caching by being
+inside the `cache` clause.
 
-To build up an intution, consider a hypothetical example for the caching case, 
-where a Predicate needs to compute a pod count only once but needs to use 
-it twice: 
 
-```yaml
+
+
+```yaml {6-10}
 kind: Predicate
 id: "demo.ensure-no-pods"
 challenge: get::self>>pod_replica_counts 

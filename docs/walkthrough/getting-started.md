@@ -25,7 +25,7 @@ store you can share with your friends.
 
 
 **Game Plan**: [boilerplate](/nope) 
--> Variables Page -> Actions Page -> Operation -> Plugins - -> Homepage 
+-> Variables -> Actions -> Operation -> Plugins -> Homepage 
 -> [Ice Kream 🍦](https://github.com/nmachine-io/playground/tree/master/ice-kream)
 
 
@@ -121,3 +121,15 @@ Clicking on your NMachine's entry in the desktop client root page, you should se
 
 
 ![](/img/walkthrough/after-mock-install.png)
+
+
+
+## NB: The Walkthrough is [YAML Maximalist](/nope)
+
+A frequent confusion about the KAMA SDK is whether you should use mostly YAML or Python. You 
+can find more about this in a [dedicated article](/nope).
+
+This guide takes the YAML maximalist route for two simple reasons: 1) YAML is easy
+to read, and 2) most people are YAML maximalists. 
+
+

@@ -238,6 +238,12 @@ which is that our `monolith.deployment.replicas` variable is now crossed out:
 
 ## 6. Health Checks
 
-Sometimes, shift happens, and problematic values do get assigned to variables. To 
+Sometimes, shift happens, and problematic values do get assigned to variables
+despite user validation.
+
+To 
+
+
+
 that end, we can define permanent health checks for individual variables. We'll use
 a list of `Predicate` descriptors again, but this time, we'll 
