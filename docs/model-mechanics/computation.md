@@ -25,22 +25,21 @@ and returns the result. This page covers how to do this referencing.
 ## Referencing Suppliers
 
 A Supplier is resolved when its parent model attempts to **read the attribute referencing it**.
-You have **two ways** to reference a `Supplier`:
+There are **two ways** to reference a `Supplier`, each very similar to what we've seen in 
+**[Associations](/model-mechanics/inflating-models)**.
 
 ### Inline Reference
 
-The inline form should feel reminiscent of expressing 
-**[inline associations](/models/models-overview)**:
+You declare a `Supplier` inline the exact same way you would a normal child descriptor:
 ```yaml
 kind: Model
 id: "parent"
 give_me_foo:
   kind: Supplier
-  id: "foo-supplier"
   source: "Foo"
 ```
 
-Reading `give_me_foo` give us `foo-supplier`'s result: 
+Reading `give_me_foo` give us the inline descriptor's result: 
 
 ```python title="$ python main.py console"
 >>> parent = Model.inflate("parent")
@@ -71,40 +70,14 @@ give_me_foo: "get::id::foo-supplier"
 
 
 
-:::info Suppliers are Lazily Resolved
 
-Inflating a parent model with a Supplier somewhere in its attributes **does not inflate the supplier**; 
-you need to actually read the attribute for any work to happen.
-
-We can prove this by pointing to Supplier with a very noticable side-effect (raising an exception) 
-and simply ignoring it:
-
-```yaml
-kind: Model
-id: "parent"
-title: "Safe!"
-you_will_not_crash:
-  kind: ExceptionSupplier
-  id: "model-crasher"
-```
-
-
-Neither inflating `parent`, nor reading the `title` will cause an exception:
-
-```python title="$ python main.py console"
-parent = Model.inflate("parent")
-parent.get_title()
-#=> "Safe!"
-```
-
-:::
-
-
-## Syntactic Sugar : `->`, `=>`, `>>` 
+## The `get::` Shorthands: `->`, `=>`, `>>` 
 
 For convenience, you can follow up your `get::<supplier-ref>` expressions with 
-one of `->`, `=>`, `>>` - an alias for a particular `serializer` (JQ, native, 
-and model) - and by a string which is your `output` expression. The general form is:
+one of `->`, `=>`, `>>`, each of which is an alias for 
+**[a particular `serializer`](/prebuilt-models/suppliers/supplier-overview#transforming-the-original-output)** 
+(JQ, native, and model). After the alias, provide a string which is your `output` expression. 
+The general form is:
 
 ```
 get::<supplier-ref>::<serializer-alias><output-expr>
@@ -112,7 +85,7 @@ get::<supplier-ref>::<serializer-alias><output-expr>
 
 Examples for each serializer type follow:
 
-#### `->` for `jq`
+### `->` for `jq`
 ```yaml {3-4}
 kind: Model
 id: "parent"
@@ -121,7 +94,7 @@ with_kind: "get::kind::MergedVariablesSupplier->. frontend.service.type"
 ```
 
 
-#### `=>` for `native`
+### `=>` for `native`
 
 ```yaml {3}
 kind: Model
@@ -145,9 +118,7 @@ that we access by wrapping with another Supplier by means of `=>`.
 kind: Supplier
 id: "the-helper"
 title: "Helper"
-
 ---
-
 kind: Model
 id: parent
 title: "Me and ${get::&id::the-helper>>title}"  
@@ -178,4 +149,4 @@ child:
 
 Notice the use of `>>`. If you've read the syntactic sugar section, you should
 know that `>>` is the alias for the `model` serializer. This makes sense because
-as we just said, `self` and `parent` return models instances.
+`self` and `parent` return models instances.
