@@ -10,11 +10,11 @@ addresses the prerequisites around both languages, as well as longer term
 strategies for YAML/Python maximalism. 
 
 **TLDR on Requirements**:
-- Do I have to know Python?. 
-  - **Yes** You'll rely on Python for rapid iteration/debugging in the 
-[interactive console](/tutorials/kama-console-tutorial).
-- Does the YAML require learning a DSL? 
-  - **Kind of**. Mainly, it's [highly idiomatic](https://news.ycombinator.com/item?id=21080606).
+- Do I have to know/use **Python?**. 
+  - **Yes.** You'll rely on Python for rapid iteration/debugging in the 
+**[interactive console](/tutorials/kama-console-tutorial)**.
+- Do I have to use **YAML?** 
+  - **No.** But for most people, **[we recommend that you do](#start-with-yaml)**.
 
 
 
@@ -24,18 +24,16 @@ strategies for YAML/Python maximalism.
 ## Why YAML-Maximalists still need Python
 
 
-If you go for YAML-Maximalism, which is [recommended approach](/tutorials/yaml-vs-python#start-with-yaml)
-when you get started, you can build an NMachine with 0 lines of Python (excluding the boilerplate). 
+If you go for YAML-Maximalism, which is the 
+**[recommended approach](#start-with-yaml)**
+for starting out, you can build an NMachine with 0 lines of Python (excluding the boilerplate). 
 
-So, why do you need Python? The answer is **developer productivity**.
+So, why do you need Python? The answer is **developer productivity**:
 
-
-
-**Feedback Loop**. You can dramatically tighten your development feedback loop
+- **Feedback Loop**. You can dramatically tighten your development feedback loop
 (e.g code, see result) by testing your models in the **[Interactive Console](/tutorials/kama-console-tutorial)** 
 before running them in NMachine client. 
-
-**Debugging**. Inside the Interactive Shell, you can inspect model attributes,
+- **Debugging**. Inside the Interactive Shell, you can inspect model attributes,
 run Actions, resolve Suppliers and Predicates, and inspect more or less all sources
 of KAMA problems.
 
@@ -46,11 +44,11 @@ of KAMA problems.
 
 ## When are YAML and Python Interchangable?
 
-Most of KAMA development is writing **[Model descriptors](/models/models-overview)**, which
-are similar to Kubernetes resources. When the NMAchine starts, you 
+Most of KAMA development is writing **[Model descriptors](/concepts/models-overview)**, which
+are similar to Kubernetes resources. When the NMachine starts, you 
 **[register your descriptors]((/tutorials/startup-sequence-tutorial#registering-your-model-descriptors))**,
 which are a list `Dict`, meaning you get to choose whether to load YAMLs or write/generate descriptors
-directly in Python.
+directly in Python: 
 
 ```python title="main.py" {9-11}
 def load_yaml_descriptors():
@@ -89,8 +87,8 @@ Once it's time to start scaling/DRYing, you can move on to the next two suggesti
 
 Hard to read YAML defaults the purpose of YAML. A hard-to-avoid source of 
 messiness is when you have Suppliers doing conditional logic. If you're 
-nesting **[`IfThenElseSupplier`](/suppliers/util-suppliers#ifthenelsesupplier)**s,
-or **[`ListFilterSupplier`](/suppliers/util-suppliers#listfiltersupplier)**s,
+nesting **[`IfThenElseSupplier`](/prebuiltmodels/suppliers/util-suppliers#ifthenelsesupplier)**s,
+or **[`ListFilterSupplier`](/prebuiltmodels/suppliers/util-suppliers#listfiltersupplier)**s,
 then you should probably write your own models.
 
 

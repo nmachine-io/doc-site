@@ -22,16 +22,6 @@ id: "inflation-intro"
 ```
 
 
-## Relevance for YAML Maximalists
-
-It might seem at first that this topic is only relevant to
-[Python Maximalists](/nope). **This is not the case**. Even if you only use
-YAML in your KAMA, your descriptors will need to conform to the
-rules of model inflation, namely for **descriptor inheritance** and **associations**.
-
-Regardless, you will make heavy use of the 
-[KAMA interactive console](/tutorials/kama-console-tutorial) where you will need to inflate your models. 
-<!-- ::: -->
 
 ## The Four ways of Inflating a Model
 
@@ -143,3 +133,16 @@ Python object of class of type `C` where `C =< K =< Model`.
 ```python title="$ python main.py console"
 model = Action.inflate({'kind': "", id': "my-first-model"})
 ```
+
+
+
+## Relevance for YAML Maximalists
+
+It might seem at first that this topic is only relevant to
+[Python Maximalists](/nope). **This is not the case**. Even if you only use
+YAML in your KAMA, your descriptors will need to conform to the
+rules of model inflation, namely for **descriptor inheritance** and **associations**.
+
+Regardless, you will make heavy use of the 
+[KAMA interactive console](/tutorials/kama-console-tutorial) where you will need to inflate your models. 
+<!-- ::: -->

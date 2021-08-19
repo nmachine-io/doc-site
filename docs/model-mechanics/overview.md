@@ -20,11 +20,11 @@ descriptors are expected to act as callbacks with inputs and outputs, and logic 
 
 
 
-## This Topic is Easier than it Seems
+## Note on Difficulty: Idiomatic, not Hard
 
 While not technically a DSL, descriptor mechanics are **highly idiomatic**. The original SDK had no
  idioms or special mechanics; these things
-emerged overtime as a means to scale the system; they are a means, rather than an end.
+emerged overtime as a means to scale the system.
 There is no getting around some learning, but we argue that is a cheap and worthwhile investment, because:
 
 1. **Familiarity and Intuition**. The idioms we introduce merely implement ideas that are second-nature
