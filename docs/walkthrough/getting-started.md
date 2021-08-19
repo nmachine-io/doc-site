@@ -25,7 +25,7 @@ store you can share with your friends.
 
 
 **Game Plan**: [boilerplate](/nope) 
--> Variables -> Actions -> Operation -> Plugins -> Homepage 
+-> Variables -> System Checks -> Actions -> Operation -> Plugins -> Homepage 
 -> [Ice Kream 🍦](https://github.com/nmachine-io/playground/tree/master/ice-kream)
 
 

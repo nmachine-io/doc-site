@@ -80,7 +80,12 @@ The question becomes: how can do we, from our descriptor, access the "original"
 versus the "new" version of the `title`?
 
 
+```yaml
+kind: PatchManifestVariablesAction
+id: virtuals
+info: "Highjacked '${get::self>>resolved_title}'!"
 
+```
 
 ```python
 >>> inst = Model.inflate("virtuals")
@@ -94,7 +99,7 @@ versus the "new" version of the `title`?
 ### Problem: Infinite Recursion
 
 We know that 
-**[descriptors can inherit from each other](/tutorials/inflating-models-tutorial#inheriting-from-another-descriptor)**
+**[descriptors can inherit from each other](/model-mechanics/inflating-models-tutorial#inheriting-from-another-descriptor)**
 to stay DRY. If B inherits A, then A is deep merged into A, meaning B overwrites any attributes it 
 had in common with A.
 However, what if we needed to **redefine an attribute in terms of its original value**. 

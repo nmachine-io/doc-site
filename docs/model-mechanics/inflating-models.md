@@ -1,8 +1,9 @@
 ---
-sidebar_label: Inflating Models
+sidebar_position: 2
+sidebar_label: Inflation
 ---
 
-# Inflating Models
+# Model Inflation & Association
 
 Inflating means going from _something_ (we'll see what that can be) to a Python object 
 that is an instance of `Model`. For example:
@@ -21,8 +22,7 @@ id: "inflation-intro"
 ```
 
 
-<!-- :::danger Important -->
-## This is Relevant for YAML Maximalists
+## Relevance for YAML Maximalists
 
 It might seem at first that this topic is only relevant to
 [Python Maximalists](/nope). **This is not the case**. Even if you only use

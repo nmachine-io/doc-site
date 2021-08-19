@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4
-sidebar_label: Querying Models
+sidebar_label: Querying
 ---
 
 # Querying Model Descriptors

@@ -29,7 +29,7 @@ docs to know what their inputs and outputs are. Use table below as a handy refer
 
 All subclasses of `Supplier` support the following attributes.
 
-{@import ./../../partials/supplier-attrs.md} 
+{@import ./../../../partials/supplier-attrs.md} 
 
 
 ## Invoking Suppliers

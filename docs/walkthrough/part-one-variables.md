@@ -19,16 +19,6 @@ you'll need to model your own variables. Find all final variables descriptors fo
 [Ice Kream 🍦](https://github.com/nmachine-io/mono/tree/master/ice-kream) in the 
 [Github repo](https://github.com/nmachine-io/mono/tree/master/ice-kream/ice-kream-kama/descriptors/variables).
 
-The game plan:
-1. **Model** itself
-1. **Inputs** validations
-1. **Dependency** relations
-1. **Health checks**
-1. **Error remediations**
-
-
-
-
 Make sure you understand how the KAMA thinks about manifest variables
 by reading the [KTEA Concept Overview](/concepts/ktea-concept). Additionally,
 have a look at the values our 
@@ -146,17 +136,19 @@ kind: Predicate
 id: app.predicate.mono-replicas-non-zero
 reason: "Zero replicas will take the website down. Make sure this is temporary."
 operator: "greater-than"
+challenge: get::self>>value
 check_against: 0
+
 ```
 
 Let's test our descriptor out by inflating and 
-**[patching](/tutorials/inflating-models-tutorial#patching)** its `challenge` attribute:
+**[patching](/model-mechanics/inflating-models-tutorial#patching)** its `challenge` attribute:
 
 ```python
 >>> pred = Predicate.inflate("app.predicate.mono-replicas-non-zero")
->>> pred.patch({'challenge': 4}).resolve()
+>>> pred.patch({'value': 4}).resolve()
 True
->>> pred.patch({'challenge': 0}).resolve()
+>>> pred.patch({'value': 0}).resolve()
 False
 ```
 
@@ -173,7 +165,7 @@ validators:
 What's happening here? Every time the user moves the slider, 
 your `monolith.deployment.replicas` model gets inflated, then its
 child `validators` get inflated and 
-[patched](/tutorials/inflating-models-tutorial#patching) with `challenge: <value from user input>`.
+[patched](/model-mechanics/inflating-models-tutorial#patching) with `value: <value from user input>`.
 
 We can see this in action with the incoming HTTP requests:
 
@@ -236,14 +228,49 @@ which is that our `monolith.deployment.replicas` variable is now crossed out:
 ![](/img/walkthrough/var-barred.png)
 
 
-## 6. Health Checks
-
-Sometimes, shift happens, and problematic values do get assigned to variables
-despite user validation.
-
-To 
 
 
 
-that end, we can define permanent health checks for individual variables. We'll use
-a list of `Predicate` descriptors again, but this time, we'll 
+
+
+
+
+
+## 6. Adding Permanent Health Checks
+
+We can give our manifest variable new validations that run anytime,
+not just on [user input](#4-validating-user-input) requests. These validations are
+called Health Checks, and are modelled with just ordinary 
+[Predicate models](/models/predicates/predicates-base) at the `health_predicates` attribute.
+
+
+Let's re-use our `"monolith.deployment.replicas > 0"` predicate 
+from [Step 4](#4-validating-user-input). Upon inflation, every `Predicate` in `health_predicates` 
+also gets patched with `value: <current variable value>`, so we can list our 
+  `app.predicate.mono-replicas-non-zero` without any changes:
+
+
+```yaml title="descriptors/variables/deployment"
+kind: ManifestVariable
+id: "monolith.deployment.replicas"
+# ...
+health_predicates:
+  - "id::app.predicate.mono-replicas-non-zero"
+```
+
+Putting it to the test:
+
+```python
+>>> replicas_var = ManifestVariable.inflate("monolith.deployment.replicas")
+>>> config_man.patch_user_vars({"monolith.deployment.replicas": 1})
+>>> replicas_var.get_problems()
+[]
+>>> config_man.patch_user_vars({"monolith.deployment.replicas": 0})
+>>> replicas_var.get_problems()
+[<kama_sdk.model.predicate.predicate.Predicate object at 0x7facd46bce80>]
+>>> 
+```
+
+Our variable gets stigmatized in the client app:
+
+![](/img/walkthrough/unhealthy-var.png)

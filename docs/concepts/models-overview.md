@@ -1,32 +1,76 @@
 ---
-sidebar_position: 0
-sidebar_label: Overview
+sidebar_position: 2
+sidebar_label: Models
 ---
+
+
+
 
 # Models Overview
 
-Models the are the entities that make up the KAMA's world view, representing various
-objects and processes in the Kubernetes/DevOps universe.
- The SDK provides
-a multitude of models, which you, as a publisher, create instances of 
-using descriptors, giving your NMachine its behavior. 
+Models are the fundamental building blocks in the KAMA SDK. As a developer, you
+write model descriptors that represent objects in the Kubernetes operations 
+domain space, which the KAMA SDK parses and turns into functionality for the end-user.
 
-Models are a large topic; this page introduces the main concepts and links
-to more in depth material when necessary. The majority of the material
-relates to the special tricks Models use to.
+A helpful approximation would be to say that, where Kubernetes resources model the computing 
+infrastructure itself (Deployments etc...), KAMA Models model
+_the operation of_ Kubernetes applications, things like 
+[manifest variables](/pre-built-models/variables/manifest-variables),
+[health checks](/pre-built-models/predicates/predicates-base), 
+[operations](/pre-built-models/operations/operations), 
+and general [actions](/pre-built-models/actions/action-base). 
 
-The picture below should help you build an intuition
-for how the models you write map onto the NMachine your users see.
+There are **two distinct model-related topics** to learn:
+**[Models Mechanics](/model-mechanics/overview)** and 
+**[Prebuilt Models](/pre-built-models/overview)**. This page serves as 
+a launch pad; read through it to build
+an intuition for the whole picture, and then dive into the sub-topic knowing
+larger context they fit into. 
 
-<p align="center">
-  <img src='/img/models/operations/breakdown.png' width="100%" />
-</p>
+
+
+
+
+
+## The Role of Models
+
+Models in KAMA play the same role that resources play in Kubernetes. They expose 
+a simple, low-code API (YAML != code 💅) to describe well-scoped behavior that
+a more complex engine, hidden to the developer, turns into useful content and action.
+
+The SDK **[inflates](/model-mechanics/inflating-models)** your models when it needs 
+to fulfil a user request. The picture below sketches out the mapping between
+your models, and the finalized output rendered to the user. This image in particular
+concerns [operations](/pre-built-models/operations/operations), but applies to
+every single page in the NMachine client.
+
+![](/img/models/operations/breakdown.png)
+
+
+
+
+
+
+
+## Prebuilt Models and Descriptors
+
+The KAMA SDK ships with about 50 models and 30 descriptors. Throughout your KAMA 
+[development journey](/walkthrough/getting-started), you will be most prebuilt
+models, as well as a handful of prebuilt descriptors.
+
+### Prebuilt Models
+
+### Prebuilt Descriptors 
+
+
+
+
 
 
 ## Writing Model Descriptors in YAML
 
 You declare instances of Models the same way you declare Kubernetes resources: 
-by writing descriptors, usually in YAML. How you register models is covered  in the 
+by writing descriptors, **[usually in YAML](/tutorials/yaml-vs-python)**. How you register models is covered  in the 
 **[Startup Sequence Tutorial](/startup-sequence-tutorial#registering-your-model-descriptors)**. 
 The snippet below shows a simple YAML descriptor for a common model - the `ManifestVariable`. 
 
@@ -41,9 +85,8 @@ input: {kind: OnOffInput}
 health_predicates: ["id::predicate.ingress_enabled_resource_in_sync"]
 ```
 
-The docs typically show model descriptors in YAML for readability purposes,
-but you can use Python to DRY up as your KAMA grows, as covered in the
-[YAML vs Python Guide](/tutorials/yaml-vs-python).
+
+
 
 
 
@@ -53,7 +96,7 @@ Again, like Resources in Kubernetes, Models are just classes in the KAMA SDK, or
 in a straightforward OOP hierarchy. But unlike in Kubernetes, you should 
 get comfortable with the idea that your model descriptors get inflated into
 **not-so-scary Python objects** that you can access and debug in a matter of seconds.
-This gives us a tremendous developer productivity advantage of CRDs/Operators in solutions like
+This gives us a **tremendous developer productivity advantage** of CRDs/Operators in solutions like
 Replicated.
 
 
@@ -64,54 +107,15 @@ model.get_id()
 ```
 
 How `inflate` works in the example above is the topic of 
-the **[Model Inflation Tutorial](/tutorials/inflating-models-tutorial)**. 
+the **[Model Inflation Tutorial](/model-mechanics/inflating-models-tutorial)**. 
 
 
 
-## Finding Prebuilt Models and Descriptors
-
-The KAMA SDK ships with about 30 models that span across the Kubernetes/DevOps concept space.
-Throughout your KAMA development journey (that starts [here](/walkthrough/getting-started)), 
-you will need to look up several pre-built in order to configure them properly. Refer to the
-table below for quick access. 
 
 
 
-### Prebuilt Models
 
-### Prebuilt Descriptors 
-
-
-## Inheriting from Other Descriptors
-
-Of the Model mechanics covered on this page, descriptor inheritance 
-is the simplest. If you have two descriptors `d1` and `d2`, if `d2` declares `inherit: d1`,
-then **`d1` will get deep merged into `d2` when loaded**: 
-
-```yaml
-kind: Model
-id: "d1"
-title: "D1 title"
-foo: "foo"
----
-kind: Model
-id: "d2"
-inherit: "d1"
-info: "D2 info"
-foo: "bar"
-```
-
-Testing out the merging rules:
-
-```python title="$ python main.py console"
-d2 = Model.inflate("d2")
-(d2.get_title(), d2.get_info(), d2.get_attr("foo"))
-("D1 title", "D2 info", "bar")
-# => 
-```
-
-
-## Expressing Model Associations in Descriptors 
+## Inflating and Associating Model Descriptors 
 
 Many prebuilt models have **belonging relationships** with other models. These will
 be specified in the that model's Attributes Table in the documentation. Notice 
@@ -162,6 +166,8 @@ id: "child-one"
 
 
 
+
+
 ## Computation Inside Descriptors
 
 The biggest difference between descriptors in KAMA and Kubernetes is templating.
@@ -186,7 +192,7 @@ can go the **[Python-maximalist](/nope)** route instead.
 
 A `Supplier` is a special `Model` subclass that gets treated 
 **as an invokable function** when read in a descriptor. It is important you
-read through the **[Supplier Documentation](/suppliers/supplier-overview)** 
+read through the **[Supplier Documentation](/pre-built-models/suppliers/supplier-overview)** 
 over the course of your KAMA development journey. 
 
 For now, we can build up a quick intuition with a (nearly) real world example - 
@@ -212,7 +218,7 @@ Again, this topic requires some investment; make sure put the
 We just saw that attribute _values_ can be dynamic. In addition to this, 
 `Model` also has a language of special clauses and escape codes that let
 you do things like caching and self-referential attribute redefinition. 
-This is called the **[Attribute Lookup Pipeline](/tutorials/lookup-pipline-tutorial)**
+This is called the **[Attribute Lookup Pipeline](/model-mechanics/inflating-models-tutorial)**
 
 This is another topic that requires one's full attention, so make sure to read
 the full guide. For now, the snippet below should help you build an intuition;

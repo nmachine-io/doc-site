@@ -4,21 +4,22 @@ sidebar_position: 0
 sidebar_label: Welcome
 ---
 
-# Documentation for Publishers
+# NMachine Documentation
 
 Welcome to the NMachine documentation site. Here you will find the resources to
-develop and distribute your NMachine.
+develop and distribute your NMachine.  
 
 ## Learn the Concepts
 
-Before jumping into the SDK, build an understanding of NMachine with the 
-[Concepts section](/concepts/concepts-root.md).
+Start by building an understanding of core NMachine 
+**[Concepts](/concepts/concepts-root.md)**, and **[Model Mechanics](/model-mechanics/overview)**.
 
-## Build a Platform from A-to-Z
+## Start the Big Walkthrough
 
-Learn the SDK by doing. Open an IDE and build your first platform with the [A to Z Walkthrough](/walkthrough/getting-started.md).
+Learn the SDK by doing. Open an IDE and build your first platform with the 
+**[A to Z Walkthrough](/walkthrough/getting-started.md)**.
 
-## Browse the SDK Models Reference
+## Browse Prebuilt Models 
 
 Move faster by leveraging core NMachine Models. Surf the comprehensive 
-[Models Reference](/models/models-overview.md).
+**[Models Reference](/models/models-overview.md)**.

@@ -38,12 +38,13 @@ dedicated pages are available for each one.
 The NMachine client consumes the KAMA over HTTP/JSON. As such, the KAMA's first important function
 is processing HTTP/JSON requests. As publisher, you won't likely need to know 
 how the API's controllers, serializers, or routes work; instead you will focus on writing 
-[models](#models). Find comprehensive documentation in the [API Spec](/nope).
+**[Models](/concepts/models-overview)**. Find comprehensive documentation in the [API Spec](/nope).
 
 
 ### Models
 
-As a publisher building your KAMA, most of your focus will be Models. These are the logical
+As a publisher building your KAMA, most of your focus will be 
+**[Models](/concepts/models-overview)**. These are the logical
 entities that make up an NMachine, like a 
 [`ManifestVariable`](/models/variables/manifest-variables) or a 
 [`KubectlApplyAction`](/models/actions/kubernetes-actions#kubectlapplyaction). 
