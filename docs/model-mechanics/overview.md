@@ -20,7 +20,7 @@ descriptors are expected to act as callbacks with inputs and outputs, and logic 
 
 
 
-## Note: Idiomatic, not Difficult
+## Idiomatic is not Difficult
 
 While not technically a DSL, descriptor mechanics are **highly idiomatic**. The original SDK had no
  idioms or special mechanics; these things

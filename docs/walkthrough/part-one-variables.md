@@ -50,7 +50,7 @@ id: "monolith.deployment.replicas"
 ```
 
 The [`ManifestVariable`](/nope) uses the `flat_key` attribute to find actual manifest variable 
-in the [Master ConfigMap](/nope). If `flat_key` is missing, `id` is used instead. 
+in the [Kamafile](/nope). If `flat_key` is missing, `id` is used instead. 
 We can start building an intuition for `ManifestVariable`:
 
 ```python title="$ python main.py console"
@@ -75,7 +75,7 @@ We can start building an intuition for `ManifestVariable`:
 
 ## 2. Adding Metadata
 
-Having validated that our model is correctly interfacing with the Master ConfigMap's reality,
+Having validated that our model is correctly interfacing with the Kamafile's reality,
 we can add basic metadata, which is very easy to do. Let's update our model:
 
 ```yaml title="descriptors/variables/deployment"

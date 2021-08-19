@@ -11,8 +11,8 @@ evaluated at runtime. For example, a health check modelled as a
 the system, e.g get properties about a Node, a pod, etc...
 
 To declare a runtime-resolvable attribute value, you need to reference a 
-**[Supplier](/prebuilt-models/supplier-overview)**, which carries out the computation 
-and returns the result. This page covers how to do this referencing.
+**[Supplier](/prebuilt-models/supplier-overview)**, which, when read, carries out the computation
+and _supplies_ the result. This page covers how to do this referencing.
 
 
 
@@ -150,3 +150,171 @@ child:
 Notice the use of `>>`. If you've read the syntactic sugar section, you should
 know that `>>` is the alias for the `model` serializer. This makes sense because
 `self` and `parent` return models instances.
+
+
+
+
+
+
+
+
+
+
+## Nesting Suppliers
+
+You can nest arbitrarily many Suppliers together to chain their computations,
+just as you might in normal programming languages. The following, for instance,
+demonstrates this:
+
+```yaml
+kind: Model
+id: parent
+date: 
+  kind: FormattedDateSupplier
+  output: "%b %d at %I:%M%p %Z"
+  source:
+    kind: ConfigSupplier
+    field_key: "last_updated"
+```
+
+```python title="$ python main.py console"
+>>> inst = Model.inflate("nested")
+>>> inst.get_attr("date")
+'Aug 18 at 06:58PM'
+```
+
+Note, however, that there is no equivalent for the syntactic sugar `get::` approach,
+e.g **you cannot write something like `get::(id::foo())`**. This is a design choice
+made for the sake of readability.
+
+
+
+
+
+
+
+
+## Suppliers inside Lists
+
+When an attribute's value's type is a List, each item gets supplier-resolved.
+
+```yaml
+kind: Model
+id: "lists"
+strings:
+  - "get::kind::RandomStringSupplier"
+  - "get::kind::RandomStringSupplier"
+``` 
+
+```python title="$ python main.py console"
+>>> inst = Model.inflate("lists")
+>>> inst.get_attr("strings")
+['nBmobFxhSpEjGcbk', 'YiEyMkAvqVbJweyX']
+```  
+
+:::info Dicts in Lists?
+Check out the next section. If your list items are Dicts, you'll need to use `depth=`.  
+:::
+ 
+ 
+ 
+ 
+ 
+ 
+## Suppliers inside Dicts 
+
+What happens when your supplier is _inside_ a Dict?
+
+### The Default Behavior is Non-Recursive
+
+By default, attribute resolution is **not recursive**. The resolution engine
+will try to resolve scalars and lists, as we have seen, but if it gets
+a `Dict`, unless the `Dict` itself is `kind: <Supplier subclass>`, the 
+engine **will not try to find suppliers nested in the dict's attributes**. Consider the following:
+
+```yaml
+kind: Model
+id: "supplier-in-dict"
+nesting:
+  separation:
+    kind: Supplier
+    source: "Won't get resolved by default."
+```
+
+In this example, when we try to resolve `nesting`, the resolution 
+engine does not see the `kind: <Supplier subclass>` required for supplier resolution 
+and will therefore take it as face value, thus yielding the `Dict` as-is: 
+
+```python title="$ python main.py console"
+>>> inst = Model.inflate("supplier-in-dict")
+>>> inst.get_attr("nesting")
+{'separation': {'kind': 'Supplier', 'source': "Won't get resolved by default."}}
+```
+
+
+### Forcing Recursive Resolution with `depth=`
+
+To force attribute resulution inside a Dict, **you need to pass `depth=<X>`**. Using
+the descriptor from the last example, we can get `nesting` to full resolve as follows:
+
+```python title="$ python main.py console" {2}
+>>> inst = Model.inflate("supplier-in-dict")
+>>> inst.get_attr("nesting", depth=100)
+{'separation': "Won't get resolved by default."}
+```
+
+Each model knows which attributes _ought to be_ Dicts, so it's their job to use
+`depth=`. Assuming you don't write custom models, the only time you will use this is
+when debugging your models in the console. 
+
+
+
+
+
+
+
+
+
+
+## Preventing Resolution with `&`
+
+You will sometimes need to pass a Supplier _itself_ to an attribute, rather than 
+the value it resolves to. This is akin to passing a function reference in normal 
+programming languages.
+
+To do this, add `"&"` in front of your `id::` or `kind::` reference. For instance:
+
+```yaml
+kind: Supplier
+id: "delayed_gratification"
+soruce: "delayed gratification"
+---
+kind: Model
+id: "parent"
+supplier_itself: "get::&id::delayed_gratification" 
+```
+
+As expected, getting `supplier_itself` gives us an instance of `Supplier` inflated with
+the `delayed_gratification` descriptor.
+
+```python title="$ python main.py console"
+parent = Model.inflate("parent")
+supplier = parent.get_attr("delayed_gratification")
+type(supplier), supplier.resolve()
+# => (Supplier, "delayed gratification")
+```  
+
+
+
+
+
+
+
+
+
+
+
+## Outputting Model Descriptors from Suppliers
+
+Some Suppliers, like the `IfThenElseSupplier` are often used to return entire 
+model descriptors, as opposed to regular data.  

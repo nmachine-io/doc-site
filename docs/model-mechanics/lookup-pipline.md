@@ -1,5 +1,6 @@
 ---
 sidebar_label: Lookup Pipeline
+sidebar_position: 4
 ---
 
 # The Attribute Lookup Pipeline
@@ -20,9 +21,9 @@ sure each read each section.
 ## Cached Attributes
 
 We know that YAML-based descriptors can 
-[perform computations using `Supplier`](/suppliers/supplier-overview). 
-The question becomes can we cache results for reuse? This is easy to 
-do with the `cache` clause:
+**[perform computations using `Supplier`](computation.md)**. 
+The followup question becomes whether we cache results for reuse? The answer is Yes, 
+and it is made easy with the `cache` clause:
 
 ```yaml title="Using the cached clause"
 kind: Model
@@ -61,6 +62,8 @@ To escape the caching, use **`_no_cache_<attribute_name>`**:
 
 
 
+
+
 ## Virtual and Resolved Attributes
 
 You may have noticed we use `Model#get_title` in many of our examples. Most
@@ -94,17 +97,22 @@ info: "Highjacked '${get::self>>resolved_title}'!"
 ```
 
 
+
+
+
+
+
 ## Self-Referential Attribute Redefinition
 
 ### Problem: Infinite Recursion
 
 We know that 
-**[descriptors can inherit from each other](/model-mechanics/inflating-models-tutorial#inheriting-from-another-descriptor)**
+**[descriptors can inherit from each other](inflating-models.md#inheriting-from-another-descriptor)**
 to stay DRY. If B inherits A, then A is deep merged into A, meaning B overwrites any attributes it 
 had in common with A.
-However, what if we needed to **redefine an attribute in terms of its original value**. 
-Our first instinct should be to use a  
-**[`SelfSupplier` via `get::self>>`](/suppliers/supplier-overview#getself-and-getparent)**: 
+However, what if we needed to **redefine an attribute in terms of its original value**? 
+Our first instinct should be to use a 
+**[`SelfSupplier` via `get::self>>`](computation.md#getself-and-getparent)**: 
 
 ```yaml title="Crash your NMachine with a stack overflow 💀💀💀"
 kind: Model

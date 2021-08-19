@@ -64,7 +64,7 @@ To troubleshoot or configure your Kubernetes connection, read the
 ## Step 2: Initialize a mock NMachine
 
 With the SDK installed, we can create a 
-Kubernetes namespace with a [Master ConfigMap](/concepts/state-concept.md), which
+Kubernetes namespace with a [Kamafile](/concepts/state-concept.md), which
 is the sole resource an NMachine needs to manage an app. For now, we'll use the handy
 `mock-install <namespace>` utility to mock one:
 
@@ -83,7 +83,7 @@ config_man.get_ktea_config()
 # you should see the above
 ```
 
-Now we can populate the [Master ConfigMap](/nope)'s' `default_vars` with the contents of our
+Now we can populate the [Kamafile](/nope)'s' `default_vars` with the contents of our
 templating engine's `values.yaml`:
 
 
@@ -92,7 +92,7 @@ defaults = ktea_client().load_default_values()
 config_man.write_default_mvariables(defaults)
 ```
 
-We now have minimally configured Master ConfigMap. This step will get automated once we
+We now have minimally configured Kamafile. This step will get automated once we
 graduate to a full fidelity prototype. 
 
 
@@ -124,10 +124,10 @@ Clicking on your NMachine's entry in the desktop client root page, you should se
 
 
 
-## NB: The Walkthrough is [YAML Maximalist](/nope)
+## NB: The Walkthrough is [YAML Maximalist](/model-mechanics/yaml-vs-python.md)
 
 A frequent confusion about the KAMA SDK is whether you should use mostly YAML or Python. You 
-can find more about this in a [dedicated article](/nope).
+can find more about this in a **[dedicated article](/model-mechanics/yaml-vs-python.md)**.
 
 This guide takes the YAML maximalist route for two simple reasons: 1) YAML is easy
 to read, and 2) most people are YAML maximalists. 

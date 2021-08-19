@@ -71,7 +71,7 @@ class MyCustomModel(Model):
 ## The `config_space` attribute
 
 The `config_space` Model attribute, on the other hand, does affect the KAMA's behavior 
-by default. Any Model that makes use of the [Master ConfigMap](/concepts/state-concept)
+by default. Any Model that makes use of the [Kamafile](/concepts/state-concept)
 or the [KTEA client](/concepts/ktea-concept) will read its `config_space` attribute and 
 use the value to carry out the computation. 
 

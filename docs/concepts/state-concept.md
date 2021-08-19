@@ -1,12 +1,12 @@
 ---
-sidebar_label: State
+sidebar_label: Kamafile
 sidebar_position: 3
 ---
 
-# State in the KAMA: the Master ConfigMap
+# The Kamafile
 
 When the NMachine client installs an application for a user (e.g creates _an_ NMachine), 
-it begins by creating a `ConfigMap` called `master` in the application's
+it begins by creating a `ConfigMap` called `kamafile` in the application's
 namespace. This is where the installation's identity and state are stored.  
 
 ## Format
@@ -19,12 +19,12 @@ exists to let an application KAMA have mini-KAMAs inside it, each with its
 own state and variables. 
 
 Thus, the value of each `space` key is that space's state, encoded as large JSON string.
-A fresh Master ConfigMap would look something like the following:
+A fresh Kamafile would look something like the following:
 
 ```yaml title="<install namespace>/<configmaps>/master"
 kind: ConfigMap
 metadata:
-  name: master
+  name: kamafile
   namespace: xyz
   labels:
     managed_by: nmachine  
