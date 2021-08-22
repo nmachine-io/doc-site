@@ -1,9 +1,9 @@
 ---
 sidebar_position: 2
-sidebar_label: "System Checks"
+sidebar_label: "Health Checks"
 ---
 
-# Part 2. System Checks
+# Part 2. Health Checks
 
 Letting the user know what is and isn't working is the greatest form of empathy
 we can offer them. This section part of the tutorial.
@@ -95,3 +95,43 @@ the desktop client to test it out:
 
 ![](/img/walkthrough/status-running.png) 
 
+
+
+
+
+
+
+## General Health Checks
+
+You can, and should, define additional health checks that the user can run at will. To 
+do this, simply create `Predicate` descriptors with the label `searchable: true`. 
+
+Let's make the `Predicate` we just created (`app.predicate.deployments-running`) available
+as a general health check:
+
+```yaml
+kind: Predicate
+id: "app.predicate.deployments-running"
+title: "Application deployments running"
+info: "Ensures the website and database workloads are running"
+reason: "Got statuses ${get::self>>resolved_challenge}"
+check_against: ["positive", "positive"]
+labels:
+  status_computer: true
+  searchable: true
+challenge:
+  kind: ResourcesSupplier
+  serializer: "native"
+  output: "ternary_status"
+  selector:
+    res_kind: "Deployment"
+    label_selector:
+      microservice: ["monolith", "postgres"]
+```
+
+All we did was 1) add the `searchable` label, 2) add metadata attributes `title` and `info`,
+and 3) add a dynamic `reason`.
+
+The predicate now appears in the client's "Health Checks" tab under Actions:
+
+![](/img/walkthrough/health-checks-index.png)
