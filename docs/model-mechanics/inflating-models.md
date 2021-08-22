@@ -5,11 +5,12 @@ sidebar_label: Inflation
 
 # Model Inflation & Association
 
-Inflating means going from _something_ (we'll see what that can be) to a Python object 
-that is an instance of `Model`. For example:
+Inflating means going from a descriptor to its corresponding Python `Model` instance.
+There are **three times infaltion happens**:
 
+There are four ways 
 
-```yaml title="The 'something'"
+```yaml title="a descriptor"
 kind: Model
 id: "inflation-intro"
 ```

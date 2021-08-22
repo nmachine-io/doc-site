@@ -89,7 +89,7 @@ templating engine's `values.yaml`:
 
 ```python title="$ python main.py console"
 defaults = ktea_client().load_default_values()
-config_man.write_default_mvariables(defaults)
+config_man.write_default_vars(defaults)
 ```
 
 We now have minimally configured Kamafile. This step will get automated once we

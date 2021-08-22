@@ -3,19 +3,30 @@ sidebar_position: 0
 sidebar_label: Base Class
 ---
 
-# The Action Model
+# Actions
 
-An Action performs DevOps-type work so that the user doesn't have to. Examples of strictly Kubernetes 
-of work are: changing manifest variable values, generating a new manifest, running `kubectl apply`, 
-deleting resources, patching resources, etc... Not strictly Kubernetes work could be 
-sending a ping via Slack, running a shell command in one of your app's pods, notifying an API of something, etc...   
-
+An Action is anything that runs. Typically, actions encapsulate Kubernetes-related work,
+such as running `kubectl apply`, updating variable values, patching resources, etc... 
+But, you can do any other kind of work too by defining your own subclasses.
 The following image sketches out the relationship between the Action models defined in the KAMA and
 what the user sees.
 
-<p align="center">
-    <img src='/img/models/actions/action-breakdown.png' width="80%" />
-</p>
+![](/img/models/actions/action-breakdown.png)
+
+
+## The `Action` Model
+
+The base class for actions is `Action`. Its two key methods are `perform()` which subclasses
+implement to carry out the logic, and `run()`, which wraps the former and handles things like 
+errors and telemetry.
+
+
+
+
+
+
+
+
 
 
 ## The Execution Context

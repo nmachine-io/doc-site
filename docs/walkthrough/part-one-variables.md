@@ -274,3 +274,13 @@ Putting it to the test:
 Our variable gets stigmatized in the client app:
 
 ![](/img/walkthrough/unhealthy-var.png)
+
+
+
+## 7. Commit Variables, Apply Manifest
+
+**Time for action!** First, copy-paste the remaining variables from the finished 
+**[Ice Cream KAMA repo](https://github.com/nmachine-io/mono/tree/master/ice-kream/ice-kream-kama/descriptors/variables)**.
+You can just overwrite your entire `/descriptors/variables` subdirectory with the one from GitHub.
+
+Then, from the desktop client, hit the Play button on the top right of the variables page.
