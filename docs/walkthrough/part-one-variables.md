@@ -8,7 +8,7 @@ sidebar_label: Variables Page
 
 
 
-# Part 1: The Manifest Variables Page 
+# Part I: The Manifest Variables Page 
 
 The importance of manifest variables cannot be overstated for chart-based Kubernetes apps.
 Let's make Ice Kream's manifest variables a no-brainer to configure for our NMachine's end user. 

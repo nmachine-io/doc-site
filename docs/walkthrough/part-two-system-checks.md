@@ -3,7 +3,7 @@ sidebar_position: 2
 sidebar_label: "Health Checks"
 ---
 
-# Part 2. Health Checks
+# Part II. Health Checks
 
 Letting the user know what is and isn't working is the greatest form of empathy
 we can offer them. This section part of the tutorial.

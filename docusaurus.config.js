@@ -114,7 +114,10 @@ module.exports = {
     prism: {
       // darkTheme: darkCodeTheme,
       // theme: lightCodeTheme
-      theme: darkCodeTheme
+      theme: darkCodeTheme,
+      themeConfig: {
+        additionalLanguages: ['ruby']
+      }
     },
   },
   presets: [
