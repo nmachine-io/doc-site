@@ -18,20 +18,27 @@ by an auth wall:
 ![](/img/walkthrough/no-admin.png)
 
 
-## 1. Before the Operation: the Action
+
+
+
+
+
+## 1. Before the Operation: the `Action`
 
 We need to create an admin user. In a real scenario, this would be your app, and 
 you would know how to do this. In our case, 
 [Ice Kream 🍦](https://github.com/nmachine-io/mono/tree/master/ice-kream)
 is built with Ruby on Rails - source code on 
-[GitHub](https://github.com/nmachine-io/mono/tree/master/ice-kream/ice-kream-app).
+[GitHub](https://github.com/nmachine-io/mono/tree/master/ice-kream/ice-kream-app) - 
+which you'll have to pretend you wrote.
 
 
 
 ### Running `seed:admin` in a Pod 
 
-Like most Rails apps, Ice Kream has command-line interface
-for admin-level actions. We're interested in the `seed:admin` rake task in 
+Like most Rails apps, Ice Kream has a command-line interface
+for admin-level actions powered by [rake](https://guides.rubyonrails.org/v4.2/command_line.html).
+ We're interested in the `seed:admin` rake task in 
 [`/lib/tasks/seeding_tasks.rake`](https://github.com/nmachine-io/mono/blob/master/ice-kream/ice-kream-app/lib/tasks/seeding_tasks.rake)
 that works as follows:
 
@@ -121,11 +128,93 @@ D, [2021-08-23T08:38:57.260731 #65] DEBUG -- :    (0.2ms)  ROLLBACK
 
 
 
-## 2. Make it Interactive with Operation
+## 2. Make it Interactive with `Operation`
 
 We could call it a day by adding our new Action to the Actions page, but it would
 be better if the user could choose an email/password combo. For this, we turn to
-**[Operations](/prebuilt-models/operations/operations)**.
+**[Operations](/prebuilt-models/operations/operations)**. 
+
+Let's start with a descriptor that gets things on the screen. The following makes use of the 
+following models:
+1. **[`Operation`](/prebuilt-models/operations/operation)**. The outmost container model.
+1. **[`Stage`](/prebuilt-models/operations/operation)**. A set of logically related steps in the operation
+1. **[`Step`](/prebuilt-models/operations/operation)**. A single screen containing input fields that get submitted together.
+1. **[`Field`](/prebuilt-models/operations/operation)**. A user input.
+
+You'll also notice our first usage of `assets::` in `synopsis: "assets::seed-admin-synopsis.md"`; this is 
+for loading files in the `/assets` directory, explained in the
+ **[Startup Sequence Tutorial](/tutorials/startup-sequence-tutorial)**.
+
+```yaml title="descriptors/operations/seed_admin/operation.yaml"
+kind: Operation
+id: "app.op.seed_admin"
+title: "Seed Admin User"
+synopsis: "assets::seed-admin-synopsis.md"
+info: "Add a credentialed Admin user to the database."
+tags: ["Seeding"]
+labels:
+  searchable: true
+stages:
+  - kind: Stage
+    id: "app.stage.seed_admin.main"
+    title: "Credentials"
+    steps:
+      - kind: Step
+        title: "Set Admin Credentials"
+        info: "Choose an email and password for the principal admin."
+        id: "app.step.seed_admin.main.main"
+        synopsis: "assets::seed-admin-synopsis.md"
+        fields:
+          - kind: Field
+            id: "email"
+            title: "Admin Email"
+            validators:
+              - kind: FormatPredicate
+                check_against: "email"
+
+          - kind: Field
+            id: "password"
+            title: "Admin Password"
+            info: "This password will be encrypted in the application database; it will not be saved by NMachine; you are responsible for it."
+            validators:
+              - kind: FormatPredicate
+                check_against: "password"
+```
+
+This gets us 90% of the way there with content and input validation:
+
+![](/img/walkthrough/operation-one.png)
+
+
+
+
+
+
+
+## 3. Putting it all Together
+
+We have the action, and we have the operation, but they're not yet talking to each other. 
+We want the `email` and `password` fields to be passed to our `app.action.seed_admin_shell_exec`
+action when the user clicks Submit. 
+
+Turning to the **[`Field` reference](/asd)**, we see that the `target` attribute is relevant to us.
+We **don't** want to treat `admin` or `password` as manifest variables; we just want to keep them in 
+memory. As such, let's add one line to each field:
+
+```yaml title="descriptors/operations/seed_admin/operation.yaml"
+# operation.stages[0].steps[0]
+fields:
+  - kind: Field
+    id: "email"
+    target: "state"
+    #...
+  - kind: Field
+    id: "password"
+    target: "state"
+    #...
+``` 
+
+We can now safely access 
 
 
 
