@@ -33,7 +33,7 @@ is safely accessible or not.
 For our **[Ice Kream 🍦](https://github.com/nmachine-io/mono/tree/master/ice-kream)**, 
 we'll consider the app to be "running" if and only if the website and 
 postgres Deployments are running. Let us begin by getting acquainted with the central 
-actor - the **[ResourcesSelector](/nope)**:
+actor - the **[ResourceSelector](/nope)**:
 
 ```yaml title="temporary.yaml"
 kind: ResourcesSupplier

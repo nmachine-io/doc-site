@@ -93,7 +93,7 @@ hardcoded.
 Looking through the **[Prebuilt Models](/prebuilt-models)**, we find the 
 **[`PodShellExecAction`](/nope)**, which expects a `command: str` and a `pod: KatPod` attribute. We agreed
 to hardcode `command` for now, so that's take care of. For `pod`, we'll supply a `KatPod` 
-instance using **[`ResourcesSelector`](/nope)**. This gives us the following descriptor:
+instance using **[`ResourceSelector`](/nope)**. This gives us the following descriptor:
 
 ```yaml title="descriptors/operations/seed_admin/shell_action.yaml"
 kind: PodShellExecAction

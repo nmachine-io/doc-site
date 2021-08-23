@@ -1,6 +1,6 @@
-| Key          | Type                           | Lookback? | Notes                                                                                                                      |
+| Key          | Type                           |  Notes                                                                                                                      |
 |--------------|--------------------------------|-----------|----------------------------------------------------------------------------------------------------------------------------|
-| `source`     | Any                            | No        | By convention, but not necessarily, the main param. Also returned as output if the subclass does not override `_compute()` |
-| `serializer` | `jq` \| `native` \| `identity` | No        | Type of serializer that carries out any output formatting given by `output`                                                |
-| `output`     | string                         | No        | Expression that defines a mapping function between original output and final output                                        |
-| `many`       | `auto` \| `true` \| `false`    | No        | Serializer-specific but generally sets behavior for handling lists outputs                                                 |
+| `source`     | Any                            |  Often, but not always, the main input. Also the output of a base (non-subclassed) `Supplier`, discounting any `serializer`/`output` transformations.  |
+| `serializer` | `jq` \| `native` \| `identity` |  Type of serializer that carries out any output formatting given by `output`                                                |
+| `output`     | `str`                         |  Expression that defines a mapping function between original output and final output                                        |
+| `many`       | `None` \| `True` \| `False`    |  Serializer-specific but generally sets behavior for handling lists outputs                                                 |
