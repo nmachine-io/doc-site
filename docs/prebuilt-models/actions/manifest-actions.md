@@ -10,7 +10,7 @@ to manifest variables manipulation.
 
 ## Atomic Actions
 
-### TemplateManifestAction
+### The `TemplateManifestAction` Model
 
 Invoke a KTEA's `POST /template` given a bundle of variable assignments
 and return the result.
@@ -37,7 +37,7 @@ e.g the resource descriptors returned by the KTEA.
 
 
 
-### PatchManifestVarsAction
+### The `PatchManifestVarsAction` Model
 
 Used to patch the working manifest variables with a bundle of assignments.
 
@@ -79,7 +79,7 @@ app:
 
 
 
-### UnsetManifestVarsAction
+### The `UnsetManifestVarsAction` Model
 
 Used remove a variable assignment from the working set.
 
@@ -102,7 +102,7 @@ victim_keys: ["frontend.replicas"]
 
 
 
-### WriteManifestVarsAction
+### The `WriteManifestVarsAction` Model
 
 Replaces the entire working set of variables with a `dict`; should rarely be used.
 

@@ -1,18 +1,17 @@
 ---
 sidebar_position: 0
-sidebar_label: Base Class
+sidebar_label: Overview
 ---
 
 # Actions
 
-An Action is anything that runs. Typically, actions encapsulate Kubernetes-related work,
-such as running `kubectl apply`, updating variable values, patching resources, etc... 
+An Action is anything that runs. Typically, actions perform Kubernetes-related work,
+such as a `kubectl apply` execution, updating variable values, patching resources, etc... 
 But, you can do any other kind of work too by defining your own subclasses.
 The following image sketches out the relationship between the Action models defined in the KAMA and
 what the user sees.
 
 ![](/img/models/actions/action-breakdown.png)
-
 
 ## The `Action` Model
 
@@ -29,41 +28,6 @@ errors and telemetry.
 
 
 
-## The Execution Context
-
-The `Action` base class itself is abstract. Subclasses must implement the `perform` method where the actual work happens.
-The base class wraps `perform` with a method called `run` to handle concerns like errors and telemetry.
-
-A custom action that demonstrates usage of the `Action` API:
-
-```python
-from typing import Dict
-from kama_sdk.core.core import config_man
-from kama_sdk.core.core.types import ErrCapture
-from kama_sdk.model.action.base.action import Action
-from kama_sdk.model.action.base.action_errors import FatalActionError
-
-class AnnotateBananaPodAction(Action):
-
-  def get_new_sweetness() -> str:
-  	return self.resolve_prop("sweetness", backup="ultra")
-
-  def perform() -> Dict:
-  	if banana_pod := KatPod.find("banana", config_man.ns()):
-      old_sweetness = banana_pod.annotations.get("sweetness")
-      new_sweetness = self.get_new_sweetness()
-      self.add_logs([f"change {old_sweetness} to {new_sweetness}"])
-      banana_pod.annotate({'sweetness': new_sweetness})
-      return {'old_sweetness': old_sweetness, 'new_sweetness': new_sweetness}
-    else:
-      raise FatalActionError(ErrCapture({
-        'type': 'no_banana',
-        'reason': f"no banana pod in namespace {config_man.ns()}"
-  	  }))
-
-```
-
-The following sub-sections focus on points of interest from the example.
 
 
 ### Halting Early with `FatalActionError`
@@ -108,6 +72,17 @@ id: my-instance
 sweetness: extreme
 
 ```
+
+
+
+
+
+
+
+
+
+
+
 
 ## The `MultiAction` Class
 

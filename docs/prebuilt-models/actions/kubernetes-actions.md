@@ -8,7 +8,7 @@ Actions that talk to the user's cluster, either with `k8kat` or `kubectl`.
 
 ## Atomic Actions
 
-### KubectlApplyAction
+### The `KubectlApplyAction` Model
 
 Used to run `kubectl apply` for a list of `dict`s. 
 
@@ -16,6 +16,7 @@ Used to run `kubectl apply` for a list of `dict`s.
 kind: KubectlApplyAction
 res_descs:
   - kind: Secret
+    apiVersion: v1
     metadata:
       name: example
     data: {}
@@ -25,10 +26,10 @@ res_descs:
 
 | Key                   | Type          | Notes                                                                                               |
 |-----------------------|---------------|-----------------------------------------------------------------------------------------------------|
-| `res_descs`           | List of dicts | Short for "resource descriptors". Compiled into temporary file for `kubectl apply -f file.yaml`     |
+| `res_descs`           | `List[Dict]` | Short for "resource descriptors". Compiled into temporary file for `kubectl apply -f file.yaml`     |
 
 
-### AwaitOutkomesSettledAction
+### The `AwaitKaosSettledAction` Model
 
 For each `KubectlApplyOutcome` given in the attributes, create a sub-action that polls the resource's status,
 terminating according to the following:
@@ -36,7 +37,7 @@ The sub-actions either succeed if the resource settles successfully or raise an 
 if the resource is in a `negative` state.   
 
 
-### PatchResourceAction
+### The `PatchResourceAction` Model
 
 Used to patch a Kubernetes resources. 
 
@@ -58,7 +59,7 @@ patch:
 | `kat_res`  | [`KatRes`](/concepts/k8kat.md)                          | the target resource; overrides `selector` if both present |
 
 
-### DeleteResourcesAction
+### The `DeleteResourcesAction` Model
 
 Given a list of resource selectors, delete all resource found by selectors.
 
