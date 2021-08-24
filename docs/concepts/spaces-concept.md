@@ -7,7 +7,7 @@ sidebar_position: 4
 
 The KAMA supports Plugins, which are like mini-KAMAs that you as a publisher 
 can include in your own KAMA.
-Like the main KAMA, these mini-KAMAs also need to have their own [state](/concepts/state-concept)
+Like the main KAMA, these mini-KAMAs also need to have their own [state](/concepts/kamafile-concept)
 tracked.  
 
 
@@ -71,7 +71,7 @@ class MyCustomModel(Model):
 ## The `config_space` attribute
 
 The `config_space` Model attribute, on the other hand, does affect the KAMA's behavior 
-by default. Any Model that makes use of the [Kamafile](/concepts/state-concept)
+by default. Any Model that makes use of the [Kamafile](/concepts/kamafile-concept)
 or the [KTEA client](/concepts/ktea-concept) will read its `config_space` attribute and 
 use the value to carry out the computation. 
 

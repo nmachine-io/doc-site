@@ -6,7 +6,7 @@ sidebar_label: Kamafile
 # Kamafile Suppliers
 
 The following `Supplier` subclasses supply data from the 
-[Kamafile](/concepts/state-concept). Note that, because the Kamafile
+[Kamafile](/concepts/kamafile-concept). Note that, because the Kamafile
 is partitioned into [Spaces](/concepts/spaces-concept), each
 subclass below reads its `config_space` attribute; you'll need to think about this
 when you start customizing plugins, as [explained here](#dealing-with-config_space).
@@ -22,7 +22,7 @@ i.e without a descriptor. The models that invoke such suppliers use
 ## The `MergedVariablesSupplier` Model
 
 Returns a left-to-right deep-merge of the 
-[three levels of variables](/concepts/state-concept#manifest-variables) stored
+[three levels of variables](/concepts/kamafile-concept#manifest-variables) stored
 in the Kamafile, where left is the `default_vars` and right is the `user_vars`. 
 Often used to assemble the final set of variables to feed to the
  [KTEA](/concepts/ktea-concept) for templating.

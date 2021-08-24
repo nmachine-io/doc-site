@@ -20,20 +20,7 @@ you'll need to model your own variables. Find all final variables descriptors fo
 [Github repo](https://github.com/nmachine-io/mono/tree/master/ice-kream/ice-kream-kama/descriptors/variables).
 
 Make sure you understand how the KAMA thinks about manifest variables
-by reading the [KTEA Concept Overview](/concepts/ktea-concept). Additionally,
-have a look at the values our 
-[templating engine](https://github.com/nmachine-io/mono/tree/master/ice-kream/ice-kream-ktea)
-produces:
-
-```bash
-curl https://api.nmachine.io/ktea/nmachine/ice-kream-ktea/1.0.1/values | jq
-```
-
-If you are curious about the templating engine itself, it is 
-[kerbi mixer](https://nmachine-io.github.io/kerbi), not a Helm chart; 
-source code [on GitHub](https://github.com/nmachine-io/mono/tree/master/ice-kream/ice-kream-ktea).
-
-
+by reading the [KTEA Concept Overview](/concepts/ktea-concept). 
 
 
 
@@ -41,7 +28,7 @@ source code [on GitHub](https://github.com/nmachine-io/mono/tree/master/ice-krea
 
 ## 1. Bare Minimum `ManifestVariable`
 
-Like any good Kubernetes tutorial, we'll start with replicas. Let's create the
+Like any good Kubernetes tutorial, we start with replicas. Let's create the
  bare minimum **[ManifestVariable](/models/variables/manifest-variables)** descriptor:
 
 ```yaml title="descriptors/variables/deployment"
@@ -75,8 +62,8 @@ We can start building an intuition for `ManifestVariable`:
 
 ## 2. Adding Metadata
 
-Having validated that our model is correctly interfacing with the Kamafile's reality,
-we can add basic metadata, which is very easy to do. Let's update our model:
+Having validated that our model is correctly interfacing with the kamafile,
+we can add basic metadata, which is very easy to do:
 
 ```yaml title="descriptors/variables/deployment"
 kind: ManifestVariable
@@ -91,8 +78,8 @@ Let's look at our variable in the desktop client:
 ![](/img/walkthrough/var-one.png)
 
 What happened here is fairly obvious except for `id::sdk.variable-category.compute` - our first 
-**[model association](/models/models-overview#expressing-model-associations-in-descriptors)**, 
-which is to [VariableCategory](/models/variables/variable-category.md).
+**[Association](/models/models-overview#expressing-model-associations-in-descriptors)**, 
+which is to **[`VariableCategory`](/models/variables/variable-category.md)**.
 
 
 

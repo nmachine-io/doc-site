@@ -84,7 +84,7 @@ a deeper understanding of the KTEA <-> KAMA mechanism, keep reading.
 ### Definition
 
 When the NMachine client installs an application, it writes a `ktea` entry in the 
-master `ConfigMap` (see [Concepts](/concepts/state-concept.md)) with three key-value assignments:
+master `ConfigMap` (see [Concepts](/concepts/kamafile-concept.md)) with three key-value assignments:
 
 {@import ./../../partials/ktea-dict.md}
 

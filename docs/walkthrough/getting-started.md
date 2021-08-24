@@ -64,7 +64,7 @@ To troubleshoot or configure your Kubernetes connection, read the
 ## Step 2: Initialize a mock NMachine
 
 With the SDK installed, we can create a 
-Kubernetes namespace with a [Kamafile](/concepts/state-concept.md), which
+Kubernetes namespace with a [Kamafile](/concepts/kamafile-concept.md), which
 is the sole resource an NMachine needs to manage an app. For now, we'll use the handy
 `mock-install <namespace>` utility to mock one:
 

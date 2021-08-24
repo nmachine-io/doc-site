@@ -33,3 +33,33 @@ class AnnotateBananaPodAction(Action):
 ```
 
 The following sub-sections focus on points of interest from the example.
+
+
+
+### Halting Early with `FatalActionError`
+
+If the action cannot be completed and needs to halt early, or if it somehow failed,
+ you should raise a special `Error` called `FatalActionError`. 
+
+The  `FatalActionError` constructor
+takes an `ErrorCapture` (which is just a `dict`) as its sole argument. The `ErrCapture`
+holds metadata that will be communicated to the user and the publisher. 
+
+Besides the required `type` and `reason` attributes, you can optionally 
+provide `extras`, which must be a `Dict`. For example:
+
+
+```python
+raise FatalActionError(ErrCapture({
+  #...
+  'extras': { 
+    'resource_kind': 'Pod', 
+    'resource_name': 'banana' 
+  }
+}))
+
+```
+
+As a publisher, you will be able to query and read anything in the `extras` bundle
+from the [Publisher Dashboard](https://publish.nmachine.io).
+

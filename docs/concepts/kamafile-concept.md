@@ -9,19 +9,22 @@ When the NMachine client installs an application for a user (e.g creates _an_ NM
 it begins by creating a `ConfigMap` called `kamafile` in the application's
 namespace. This is where the installation's identity and state are stored.  
 
+
+
+
 ## Format
 
 All data is stored in key-value format inside the `data` field of the 
 `ConfigMap`. 
 Each outermost key is the name of a `space` in the KAMA. If you haven't read up on
-[Spaces and Plugins](/concepts/spaces-concept.md) yet, the Space system 
+[Spaces and Plugins](/concepts/spaces-concept.md) yet, the spaces system 
 exists to let an application KAMA have mini-KAMAs inside it, each with its
-own state and variables. 
+own identity and state. 
 
 Thus, the value of each `space` key is that space's state, encoded as large JSON string.
 A fresh Kamafile would look something like the following:
 
-```yaml title="<install namespace>/<configmaps>/master"
+```yaml title="<app namespace>/kamafile"
 kind: ConfigMap
 metadata:
   name: kamafile
@@ -35,9 +38,9 @@ data:
     "status": "installing",
     "ktea": {"type": "x", "uri": "y", "version": "z"},
     "kama": {"type": "x", "uri": "y", "version": "z"},
-    "default_variables": {"x": "y"},
-    "injection_variables": {"y": "z"},	
-    "user_variables": {},
+    "default_vars": {"x": "y"},
+    "injection_vars": {"y": "z"},	
+    "user_vars": {},
     "last_synced": "2021-07-21 14:23:54.731164"
   }'
   "some.plugin": '{
@@ -56,9 +59,9 @@ The table below gives the purpose of each field in a space entry.
 | `ktea`                | Definition bundle for the current KTEA detailed [below](#ktea-dict-format) |
 | `kama`                | Definition bundle for the current KAMA detailed [below](#kama-dict-format) |
 | `status`              | Last computed status for this space: `running`, `broken` or `installing`                            |
-| `default_variables`   | Variable assignments pulled from KTEA during installation or last update.                           |
-| `injection_variables` | Variable assignments pulled from `api.nmachine.io` during "last mile" sync                          |
-| `user_variables`      | Variable assignments made by the user with the NMachine client                                      |
+| `default_vars`   | Variable assignments pulled from KTEA during installation or last update.                           |
+| `injection_vars` | Variable assignments pulled from `api.nmachine.io` during "last mile" sync                          |
+| `user_vars`      | Variable assignments made by the user with the NMachine client                                      |
 | `last_synced`         | Timestamp of last successful status/telem sync with `api.nmachine.io`                               |
 
 
