@@ -1,10 +1,14 @@
 ---
 sidebar_position: 2
+sidebar_label: Kubernetes
 ---
 
 # Kubernetes Actions
 
 The prebuilt actions below are _logically related_ only; they bear no common superclass other than `Action`.
+We refer to them as "Kubernetes Actions" because they involve interacting with Kuberntes, either 
+via **[k8kat](/tutorials/k8kat-essentials)** or `kubectl`.
+
 
 ## The `KubectlApplyAction` Model
 
@@ -205,13 +209,16 @@ resource_patch:
 
 ## The `DeleteResourcesAction` Model
 
-Given a list of resource selectors, delete all resource found by selectors.
+Given a list of resource selectors, delete all resource found by selectors. Creates
+one sub-action per victim resource found. If you pass two resource selectors that collectively
+find 10 resources, this action will generate 10 sub-actions.  
 
 ### Example
 
 ```yaml title="examples/descriptors/actions/kubernetes-actions.yaml"
 kind: DeleteResourcesAction
 id: "delete-many-res-example"
+wait_until_gone: true
 resource_selectors:
   - "expr::ConfigMap:hello-docs"
   - res_kind: "Pod"
@@ -235,9 +242,9 @@ Running it:
 []
 ```
 
-#### Attributes
+### Attributes Table
 
 | Key               | Type                                                                 | Notes                                                                                      |
 |-------------------|----------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
-| `selectors` **required**       | [`ResourceSelector`](/models/misc/resource-selector.md) | used to query the cluster to find victim resources                                         |
-| `wait_until_gone` | `bool`                                                               | if True, each sub-task waits for its target resource to no longer exist before terminating |
+| `resource_selectors` |  **[`ResourceSelector`](/models/misc/resource-selector.md)** **required** | Used to query the cluster for the victim resources.                                         |
+| `wait_until_gone` | `bool`                                                               | if True, each sub-task waits for its target resource to no longer exist before terminating. |

@@ -14,6 +14,11 @@ and its subclasses are thin object wrappers around Kubernetes resource `Dict`s.
 The **[`ResourceSelector` Model](#the-ResourceSelector-model)** is essentially
 a store of cluster query parameters that get passed to `KatRes#list`.
 
+
+
+
+
+
 ## The `ResourceSelector` Model
 
 The `ResourceSelector` is used to query the cluster. This model is **not a supplier**;
@@ -52,15 +57,15 @@ Result:
 |------------------|-----------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `namespace`      | `str`                             | Kubernetes namepsace to query (ignored if resource type given by `res_kind` is not namespaced, e.g `Node`). If `None`, defaults to installation namespace.                                                                                                                              |
 | `res_kind`       | `str` **required**                | Kubernetes resource `kind` to query. Will handle `name` and plural forms, e.g `pods` and `pod` become `Pod`.                                                                                                                                                                            |
-| `res_name`       | `str`                             | Kubernetes resource name to match against.                                                                                                                                                                                                                                               |
+| `res_name`       | `str`                             | Kubernetes resource name to match against. `*` means "all".                                                                                                                                                                                                                                          |
 | `label_selector` | `Dict` | Kubernetes resource [labels](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/) to match against. For equality, use `str: str` e.g `tier: "database"`. For set inclusion, use `str: List[str]`, e.g `tier: ["database", "memcache"]`.                            |
 | `field_selector` | `Dict` | Kubernetes resource  [fields](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)  to match against. For equality, use  `str: str`  e.g  `metadata.name: "postgres"` . For set inclusion, use  `str: List[str]` , e.g  `metadata.name: ["database", "memcache"]`. |
 
 
 
-### Inflation Shorthand
+### Special Inflation Shorthand
 
-A `ResourceSelector` supports the following inflation shorthand syntax:
+The `ResourceSelector` model supports the following **[special inflation shorthand](/nope)** syntax:
 
 ```yaml
 expr::<res_kind>:<res_name>
@@ -72,10 +77,6 @@ For example:
 kind: DeleteResourcesAction
 id: "delete-jobs"
 resource_selectors:
-  - "expr::Job:export-events"
-  - "expr::Job:clear-cache"
+  - "expr::Pod:nginx"
+  - "expr::Job:*"
 ```
-
-
-### Examples
-

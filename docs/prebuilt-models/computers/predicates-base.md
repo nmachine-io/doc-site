@@ -3,9 +3,9 @@ sidebar_label: Predicates
 sidebar_position: 1
 ---
 
-# Predicates
+# Predicate
 
-## Base Predicate
+## The `Predicate` Model
 
 A `Predicate` is a `Supplier` subclass that that can only resolve to `True/False`. 
 Most predicates work by comparing 
@@ -86,7 +86,12 @@ supplied. Explained by example:
 
 
 
-## MultiPredicate
+
+
+
+
+
+## The `MultiPredicate` Model
 
 Use the `MultiPredicate` subclass to perform AND/OR operations
 on other predicates:
@@ -109,7 +114,11 @@ The legal operator values are `and` and `or` in lower case. Anything else
 returns `False` automatically.
 
 
-## FormatPredicate
+
+
+
+
+## The `FormatPredicate` Model
 
 Use the `FormatPredicate` to check various properties of strings:
 
@@ -123,6 +132,11 @@ Use the `FormatPredicate` to check various properties of strings:
 | `path`            | `"/foo/bar.baz"`          | `"foo/bar"`           |
 
 Note that the `operator` attribute is **ignored**.
+
+
+
+
+
 
 
 

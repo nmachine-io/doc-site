@@ -6,10 +6,10 @@ sidebar_label: Principles
 # Design Principles & Philosophy
 
 
-## Stack Pollution
+## Stack Pollution 
 
 
-## Native Programmatic Interface
+## SDKs are best APIs
 
 
 ## CRDs: Automation or Knowledge?
@@ -17,7 +17,9 @@ sidebar_label: Principles
 In my experience, the CRD/Operator model can, as it is at least in part intended, increase Kubernetes application 
 people-portability but only after a non-negligible learning investment on the part of the inheritor.
 
+## "As-code" Always Wins
 
+Even if it's low code.
 
 
 ## Idiomatic is not Difficult
