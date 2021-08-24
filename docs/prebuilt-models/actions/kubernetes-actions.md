@@ -13,7 +13,7 @@ Akin to running `kubectl apply -f <filename>` in the command line, with some imp
 1. You **cannot** give a "--namespace"-style argument; all resource descriptors must have `metadata.namespace` defined.
 1. The output is a structured datatype - a list of **[`KAO`](/nope)** (kubectl apply outcome) instead of text.
 
-Example:
+### Example
 
 ```yaml title="examples/descriptors/actions/kubernetes-actions.yaml"
 kind: KubectlApplyAction
@@ -42,7 +42,7 @@ Result:
 Typically, you would use this action after a templating action of some sort 
 (i.e **[`TemplateManifestAction`](/prebuilt-models/actions/manifest-actions#the-templatemanifestaction-model)**)
 and define `res_descs` dynamically (e.g `res_descs: get::parent>>res_descs`), but for the sake
-of simplicity, the example above hardcodes `res_descs`.
+of simplicity, the example above hardcodes `kaos`.
 
 
 ### Attributes
@@ -69,10 +69,10 @@ of simplicity, the example above hardcodes `res_descs`.
 
 ## The `AwaitKaosSettledAction` Model
 
-At a high level, `AwaitKaosSettledAction` is used to wait for Kubernetes resources to settle. For 
+A `AwaitKaosSettledAction` is used to wait for Kubernetes resources to settle. For 
 example, if you submitted a `Pod` to Kubernetes, you would wait until the Pod transitiioned from 
-a pending state (e.g pulling image, container creating) to either a positive state (running, available) 
-, or a negative state (crash loop, failed to schedule, shut down, etc...). 
+a pending state (e.g pulling image, container creating) to either a positive state (running, available), 
+or a negative state (crash loop, failed to schedule, shut down, etc...). 
 What constitutes a pending, positive, and negative state comes from 
 **[`KatRes#ternary_status`](/nope)**. 
 
@@ -81,12 +81,12 @@ The `AwaitKaosSettledAction` is a subclass of
 **[`MultiAction`](/prebuilt-models/actions/actions-overview#the-multiaction-model)**, not `Action`. Given a list
 of **[`KAO`](/nope)** (kubectl apply outcome), it synthesizes its own sub-actions (one per `KAO`)
 such that each sub-action polls the Kubernetes resource corresponding to one `KAO`. 
-
 Each sub-actions's states behave according to the following rules: 
 - **`running`** if the resource's `ternary_status` is `"pending"` 
 - **`negative`** if the resource's `ternary_status` is `"negative"` or the resource is not found
 - **`positive`** if the resource's `ternary_status` is `"positive"`
 
+### Example
 
 ```yaml title="examples/descriptors/actions/kubernetes-actions.yaml"
 kind: AwaitKaosSettledAction
@@ -94,9 +94,9 @@ id: "await-kaos-example"
 kaos:
   - api_group: ''
     error: null
-    kind: configmap
-    name: hello-docs
-    verb: created
+    kind: "configmap"
+    name: "hello-docs"
+    verb: "created"
 ```
 
 Result:
@@ -125,7 +125,7 @@ of simplicity, the example above hardcodes `res_descs`.
 
 | Key                   | Type          | Notes                                                                                               |
 |-----------------------|---------------|-----------------------------------------------------------------------------------------------------|
-| `kaos`           | `List[KAO]` **required** | List of kubectl apply outcomes to inform the action which Kubernetes resources should be polled    |
+| `kaos`           | **[`List[KAO]`](/nope)** **required** | List of kubectl apply outcomes to inform the action which Kubernetes resources should be polled    |
 
 
 
@@ -138,24 +138,62 @@ of simplicity, the example above hardcodes `res_descs`.
 
 ## The `PatchResourceAction` Model
 
-Used to patch a Kubernetes resources. 
+Used to patch a Kubernetes resource with `Dict`. Calls `KatMap#patch_with_flat_dict` under the hood. 
+
+### Example
+
+Take the following statement:
+
+```python title="$ python main.py console"
+>>> cmap = KatMap.find("hello-docs", "default")
+>>> cmap.patch_with_flat_dict({"metadata.annotations": {"foo": "bar"}})
+``` 
+
+This is equivalent to:
+
+
+```yaml title="examples/descriptors/actions/kubernetes-actions.yaml"
+kind: PatchResourceAction
+id: "patch-res-example"
+resource_selector: "expr::ConfigMap:hello-docs"
+resource_patch:
+  "metadata.annotations":
+    foo: "bar"
+```
+
+
+Running it:
+
+```python title="$ python main.py console"
+>>> action = Action.inflate("patch-res-example")
+>>> action.run()
+>>> action.get_kat_res().annotations
+{'foo': 'bar', 'kubectl.kubernetes.io/last-applied-configuration': '{"apiVersion":"v1","data":{"hello":"docs"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"hello-docs","namespace":"ice-kream"}}\n'}
+>>> 
+```
+Dict to be merged onto the existing resource.
+
+:::danger The patch must be flat
+Your `resource_patch: Dict` **must be flat-keyed**. The example above would have failed if we 
+had written: 
 
 ```yaml
-kind: PatchResourceAction
-selector:
-  kind: ResourceSelector
-  res_kind: Deployment
-  label_selectors: {microservice: 'image-classifier'}
-patch: 
-  spec:
-    replicas: 2
-```
+resource_patch:
+  metadata:
+    annotations
+      foo: "bar"
+```  
+:::
+
+
+### Attributes Table
+
 
 | Key        | Type                                                    | Notes                                                     |
 |------------|---------------------------------------------------------|-----------------------------------------------------------|
-| `patch`    | `Dict` **required**                                     | data to be merged onto the existing resource              |
-| `selector` | [`ResourceSelector`](/models/misc/resource-selector.md) | used to query the cluster to find the target resource     |
-| `kat_res`  | [`KatRes`](/concepts/k8kat.md)                          | the target resource; overrides `selector` if both present |
+| `resource_patch`    | `Dict` **required**                                     | Flat dict to be merged onto the existing resource.              |
+| `resource_selector` | [`ResourceSelector`](/models/misc/resource-selector.md) | Used to lazily find the resource to be patched. Preferable to `kat_res` (below).     |
+| `kat_res`  | [`KatRes`](/concepts/k8kat.md)                          | Direct `KatRes` reference to resource to be patched. If passed, takes precedence over `resource_selector`. |
 
 
 
@@ -169,12 +207,32 @@ patch:
 
 Given a list of resource selectors, delete all resource found by selectors.
 
-```yaml title="delete-all-image-classifier-pods.yaml"
+### Example
+
+```yaml title="examples/descriptors/actions/kubernetes-actions.yaml"
 kind: DeleteResourcesAction
-selectors:
-  - kind: ResourceSelector
-    res_kind: Pod
-    label_selectors: {microservice: 'image-classifier'}
+id: "delete-many-res-example"
+resource_selectors:
+  - "expr::ConfigMap:hello-docs"
+  - res_kind: "Pod"
+    field_selector:
+      "status.phase": "Failed"
+```
+
+Running it:
+
+```python title="$ python main.py console"
+>>> action = Action.inflate("delete-many-res-example")
+>>> victims = action.compute_victim_resources()
+>>> [f"{v.kind}:{v.name}" for v in victims]
+['ConfigMap:hello-docs', 'Pod:monolith-db944b7dd-2cfsp',  'Pod:postgres-64487fcc45-rzjl6']
+
+>>> action.run()
+
+# re-inflate to clear the cache
+>>> action = Action.inflate("delete-many-res-example")
+>>> action.compute_victim_resources()
+[]
 ```
 
 #### Attributes
