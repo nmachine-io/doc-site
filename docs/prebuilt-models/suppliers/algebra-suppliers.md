@@ -15,6 +15,8 @@ found in functional programming languages.
 
 Deep-merges the list of `Dict` it receives as input. Example:
 
+### Example
+
 ```yaml title="suppliers/algebraic-suppliers.yaml"
 kind: MergeSupplier
 id: "merge-supplier"
@@ -47,6 +49,8 @@ Result:
 ## The `UnsetSupplier` Model
 
 Given a `dict` and a list of victim keys, returns the original dict without the victim keys:
+
+### Example
 
 ```yaml title="suppliers/algebraic-suppliers.yaml"
 kind: UnsetSupplier
@@ -83,7 +87,9 @@ Result:
 
 Conditionally returns one value or another depending on the _truthiness_ of `source`:
 
-```yaml
+### Example
+
+```yaml title="suppliers/algebraic-suppliers.yaml"
 kind: IfThenElseSupplier
 id: "my-supplier"
 on_true: "true is true"
@@ -122,7 +128,10 @@ Iterates over the list given `source`, and for each item, checks if the `predica
 - **[Weak Patched](/asd)** with `challenge := <item>` 
 . A new list is returned containing only the items that made the predicate resolve to True.
 
-Example:
+
+
+### Example
+
 ```yaml
 kind: ListFilterSupplier
 id: "filter-supplier"

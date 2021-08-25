@@ -9,10 +9,14 @@ The prebuilt actions below are only _logically related_; they bear no common sup
 We refer to them as "Variables Actions" because they involve reading or writing manifest variables from the 
 **[kamafile](/concepts/kamafile-concept)**.
  
-:::note Each action use `config_space`
+:::note These actions read their `config_space`
 Because each of the following actions reads/writes the **[kamafile](/concepts/kamafile-concept)**, 
-they each read their **[`config_space`](/concepts/spaces-concept#the-config_space-attribute)** attribute.
+they each read their **[`config_space`](/concepts/spaces-concept#the-config_space-attribute)** attribute. 
+If it is null or undefined, `app` will be used.
 :::
+
+
+
 
 
 
@@ -28,7 +32,7 @@ The action returns the KTEA's output as a list of `Dict` (where each `Dict` is a
 
 ### Example
 
-```python title="examples/descriptors/actions/variables-actions.yaml"
+```yaml title="examples/descriptors/actions/variables-actions.yaml"
 kind: TemplateManifestAction
 id: "template-manifest-example"
 ktea:
@@ -58,7 +62,7 @@ Result:
 
 | Key         | Type                                                               | Notes                                                                     |
 |-------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|
-| `values`    | `Dict` **required**                                                | Variable assignments bundle to be passed to the KTEA                      |
+| `values`    | `Dict` **required**                                                | Variable assignments bundle to be passed to the KTEA. Can be flat or nested e.g `{"x.y": z'}` or `{'x': {'y': 'z'}` |
 | `ktea`      | **[`KteaDict`](/concepts/ktea-concept#how-kamas-interact-with-kteas)** | If non-empty, uses a KTEA with this configuration; otherwise uses the `ktea` entry in the **[kamafile](/concepts/kamafile-concept)** for the action's `config_space`                            |
 | `resource_selectors` | **[`List[ResourceSelector]`](/prebuilt-models/computers/resource-selector)**  | if non-empty, acts as a whitelist to filter resources yielded by the KTEA |
 
@@ -84,11 +88,14 @@ Result:
 
 ## The `PatchManifestVarsAction` Model
 
-Used to patch the working manifest variables with a bundle of assignments.
+Patches one level of manifest variables in **[kamafile](/concepts/kamafile-concept)**, 
+given by `vars_level` (defaults to `"user_vars"`), with a bundle of assignments, given by 
+`values`. The patch is implemented as a deep merge where `values` is right (i.e strong) 
+and the existing variables is left (i.e weak).
 
 ### Example
 
-```python title="examples/descriptors/actions/variables-actions.yaml"
+```yamlm title="examples/descriptors/actions/variables-actions.yaml"
 kind: PatchManifestVarsAction
 id: "patch-manifest-vars-example"
 values:
@@ -111,9 +118,13 @@ Result:
 
 | Attribute      | Type                                       | Notes                                                                                      |
 |----------------|------------------------------------------|--------------------------------------------------------------------------------------------|
-| `values`       | `dict`                                  | The patch. Can be in "nested" or "flat" form, e.g `{"x.y": z'}` or `{'x': {'y': 'z'}`      |
+| `values`       | `Dict`                                  | The patch. Can be flat or nested, e.g `{"x.y": z'}` or `{'x': {'y': 'z'}`      |
 | `ktea`      | **[`KteaDict`](/concepts/ktea-concept#how-kamas-interact-with-kteas)** | If non-empty, uses a KTEA with this configuration; otherwise uses the `ktea` entry in the **[kamafile](/concepts/kamafile-concept)** for the action's `config_space`                            |
-| `target_key`   | `"user_vars"` \| `"vendor_injection_vars"` \| `"default_vars"` | The variable ownership-level the patch should be made to. Should be `"user"` in most cases |
+| `vars_level`   | `str` | The variable ownership-level the patch should be made to. Should be `"user"` in most cases |
+
+
+
+
 
 
 
@@ -121,13 +132,29 @@ Result:
 
 ## The `UnsetManifestVarsAction` Model
 
-Used remove a variable assignment from the working set.
+Removes individual variable assignments, whose keys are given by `victim_keys: List`,
+from manifest variables in the **[kamafile](/concepts/kamafile-concept)**, 
+whose level is given by `vars_level` (defaults to `"user_vars"`).
 
 
-```yaml
-kind: PatchManifestVarsAction
-victim_keys: ["frontend.replicas"]
+### Example
 
+
+```yaml title="examples/descriptors/actions/variables-actions.yaml"
+kind: UnsetManifestVarsAction
+id: "unset-manifest-vars-example"
+vars_level: "user_vars"
+victim_keys: ["x.y"]
+```
+
+Result:
+
+```python title="$ python main.py console"
+>>> config_man.write_user_vars({"x": {"y": "y", "z": "z"}})
+>>> action = Action.inflate("unset-manifest-vars-example")
+>>> action.run()
+>>> config_man.get_user_vars()
+{'x': {'z': 'z'}}
 ```
 
 
@@ -136,25 +163,45 @@ victim_keys: ["frontend.replicas"]
 
 | Attribute      | Type                                     | Default  | Notes                                                                                      |
 |----------------|------------------------------------------|----------|--------------------------------------------------------------------------------------------|
-| `victim_keys`  | List of `string`                         | `[]`     | List of nested variable keys that should be unset                                          |
-| `target_key`   | `"user"` \| `"injection"` \| `"default"` | `"user"` | The variable ownership-level the unset should be made to. Should be `"user"` in most cases |
-| `config_space` | `string`                                 | `"app"`  | ID of the KAMA-space the unset should be made to, i.e the main app or a plugin             |
+| `victim_keys`  | List of `string`                         | `[]`     | List of flat variable keys that should be unset, e.g `["x", "foo.bar.baz"]`                                          |
+| `vars_level`   | `str` |  The variable ownership-level the unset should be made to. Should be `"user"` in most cases |
 
 
 
 ## The `WriteManifestVarsAction` Model
 
-Replaces the entire working set of variables with a `dict`; should rarely be used.
 
+Completely overwrites one level of manifest variables in **[kamafile](/concepts/kamafile-concept)**, 
+given by `vars_level`, with a bundle of assignments, given by 
+`values`. Notice that `vars_level` must be explicitly given; an empty value will raise a `FatalActionError`.
 
-```yaml
+### Example
+
+```yaml title="examples/descriptors/actions/variables-actions.yaml"
 kind: WriteManifestVarsAction
+id: "write-manifest-vars-example"
+vars_level: vendor_injection_vars
 values:
   frontend:
   	service_type: Replicas
     replicas: 1
-
 ```
+
+Result:
+
+```python title="$ python main.py console"
+>>> config_man.write_user_vars({"x": {"y": "y", "z": "z"}})
+>>> action = Action.inflate("write-manifest-vars-example")
+>>> action.run()
+>>> config_man.get_user_vars()
+{'x': 'mayhem!'}
+```
+
+:::danger This action is Unforgiving
+There are few scenarios when you should prefer an overwrite to a a patch. Make sure you have 
+ruled out the **[`PatchManifestVarsAction`](#the-patchmanifestvarsaction-model)** before using this action.
+:::
+
 
 
 ### Attributes
@@ -162,6 +209,6 @@ values:
 
 | Attribute      | Type                                     | Default  | Notes                                                                                      |
 |----------------|------------------------------------------|----------|--------------------------------------------------------------------------------------------|
-| `values`       | `dict`                                   | `{}`     | The replacement. Can be in "nested" or "flat" form, e.g `{"x.y": z'}` or `{'x': {'y': 'z'}`      |
-| `target_key`   | `"user"` \| `"injection"` \| `"default"` | `"user"` | The variable ownership-level the write should be made to. Should be `"user"` in most cases |
+| `values`       | `dict`                                   | `{}`     | The replacement. Can be flat or nested, e.g `{"x.y": z'}` or `{'x': {'y': 'z'}`      |
+| `vars_level`   | `str` **required** | `"user"` | The variable ownership-level the write should be made to. Should be `"user"` in most cases |
 | `config_space` | `string`                                 | `"app"`  | ID of the KAMA-space the write should be made to, i.e the main app or a plugin             |

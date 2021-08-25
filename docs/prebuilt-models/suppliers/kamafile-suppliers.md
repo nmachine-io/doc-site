@@ -13,7 +13,7 @@ when you start customizing plugins, as [explained here](#dealing-with-config_spa
    
 :::note Several Kamafile Suppliers are Singletons
 A Supplier is considered a singleton when it can be used without any configuration,
-i.e without a descriptor. The models that invoke such suppliers use 
+i.e without a descriptor. Models that invoke such suppliers use 
 **[the `get::kind::` shorthand](/)** in conjunction with the
 **[the `->` shorthand](/model-mechanics/computation#the-get-shorthands----)**. 
 :::
@@ -27,7 +27,7 @@ in the Kamafile, where left is the `default_vars` and right is the `user_vars`.
 Often used to assemble the final set of variables to feed to the
  [KTEA](/concepts/ktea-concept) for templating.
 
-Example:
+### Example
 
 ```yaml title="examples/descriptors/suppliers/kamafile-suppliers.yaml"
 kind: Model
