@@ -65,7 +65,7 @@ Result:
 | `values`    | `Dict` **required**                                                | Variable assignments bundle to be passed to the KTEA. Can be flat or nested e.g `{"x.y": z'}` or `{'x': {'y': 'z'}` |
 | `ktea`      | **[`KteaDict`](/concepts/ktea-concept#how-kamas-interact-with-kteas)** | If non-empty, uses a KTEA with this configuration; otherwise uses the `ktea` entry in the **[kamafile](/concepts/kamafile-concept)** for the action's `config_space`                            |
 | `resource_selectors` | **[`List[ResourceSelector]`](/prebuilt-models/computers/resource-selector)**  | if non-empty, acts as a whitelist to filter resources yielded by the KTEA |
-
+| `config_space` | `string`                               | Name of the **[kamafile partition](/concepts/kamafile-concept#partitioning-by-space)** from which to get a [KTEA config](/) if a an explicit `ktea` is not given.              |
 
 ### Return Data
 
@@ -121,7 +121,7 @@ Result:
 | `values`       | `Dict`                                  | The patch. Can be flat or nested, e.g `{"x.y": z'}` or `{'x': {'y': 'z'}`      |
 | `ktea`      | **[`KteaDict`](/concepts/ktea-concept#how-kamas-interact-with-kteas)** | If non-empty, uses a KTEA with this configuration; otherwise uses the `ktea` entry in the **[kamafile](/concepts/kamafile-concept)** for the action's `config_space`                            |
 | `vars_level`   | `str` | The variable ownership-level the patch should be made to. Should be `"user"` in most cases |
-
+| `config_space` | `string`                               | Name of the **[kamafile partition](/concepts/kamafile-concept#partitioning-by-space)** the read/write carried out on.             |
 
 
 
@@ -165,7 +165,7 @@ Result:
 |----------------|------------------------------------------|----------|--------------------------------------------------------------------------------------------|
 | `victim_keys`  | List of `string`                         | `[]`     | List of flat variable keys that should be unset, e.g `["x", "foo.bar.baz"]`                                          |
 | `vars_level`   | `str` |  The variable ownership-level the unset should be made to. Should be `"user"` in most cases |
-
+| `config_space` | `string`                               | Name of the **[kamafile partition](/concepts/kamafile-concept#partitioning-by-space)** the read/write carried out on.             |
 
 
 ## The `WriteManifestVarsAction` Model
@@ -174,6 +174,11 @@ Result:
 Completely overwrites one level of manifest variables in **[kamafile](/concepts/kamafile-concept)**, 
 given by `vars_level`, with a bundle of assignments, given by 
 `values`. Notice that `vars_level` must be explicitly given; an empty value will raise a `FatalActionError`.
+
+️‍🔥  This action is unforgiving. There are few scenarios when you should prefer an overwrite to a patch. 
+Make sure you have ruled out the **[`PatchManifestVarsAction`](#the-patchmanifestvarsaction-model)** 
+before using this action.
+
 
 ### Example
 
@@ -197,18 +202,14 @@ Result:
 {'x': 'mayhem!'}
 ```
 
-:::danger This action is Unforgiving
-There are few scenarios when you should prefer an overwrite to a a patch. Make sure you have 
-ruled out the **[`PatchManifestVarsAction`](#the-patchmanifestvarsaction-model)** before using this action.
-:::
 
 
 
 ### Attributes
 
 
-| Attribute      | Type                                     | Default  | Notes                                                                                      |
-|----------------|------------------------------------------|----------|--------------------------------------------------------------------------------------------|
-| `values`       | `dict`                                   | `{}`     | The replacement. Can be flat or nested, e.g `{"x.y": z'}` or `{'x': {'y': 'z'}`      |
-| `vars_level`   | `str` **required** | `"user"` | The variable ownership-level the write should be made to. Should be `"user"` in most cases |
-| `config_space` | `string`                                 | `"app"`  | ID of the KAMA-space the write should be made to, i.e the main app or a plugin             |
+| Attribute      | Type                                      | Notes                                                                                      |
+|----------------|------------------------------------------|--------------------------------------------------------------------------------------------|
+| `values`       | `dict`                                   | The replacement. Can be flat or nested, e.g `{"x.y": z'}` or `{'x': {'y': 'z'}`      |
+| `vars_level`   | `str` **required** | The variable ownership-level the write should be made to. Should be `"user"` in most cases |
+| `config_space` | `string`                               | Name of the **[kamafile partition](/concepts/kamafile-concept#partitioning-by-space)** the read/write carried out on.             |
