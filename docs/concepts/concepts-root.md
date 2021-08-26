@@ -8,8 +8,9 @@ sidebar_label: Overview
 ## What is NMachine?
 
 You can think of NMachine as:
-- A Helm/Brigade wrapper
-- A Platform as Code SDK that outputs application-specific Herokus
+- A Helm wrapper + Brigade substitute
+- A Platform as Code SDK
+- An application-specific Heroku factory
 - A Kubernetes B2B App Store
 
 
