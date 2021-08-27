@@ -12,14 +12,14 @@ develop and distribute your NMachine.
 ## Learn the Concepts
 
 Start by building an understanding of core NMachine 
-**[Concepts](/concepts/concepts-root.md)**.
+**[Concepts](/concepts/nmachine-concept)**.
 
 ## Build an NMachine from A to Z
 
 Learn the SDK by doing. Open an IDE and build your first platform with the 
-**[A to Z Walkthrough](/walkthrough/getting-started.md)**.
+**[A to Z Walkthrough](/walkthrough/getting-started)**.
 
 ## Browse Prebuilt Models 
 
 Move faster by leveraging core NMachine Models. Surf the comprehensive 
-**[Models Reference](/models/models-overview.md)**.
+**[Models Reference](/models/models-overview)**.

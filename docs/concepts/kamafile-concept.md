@@ -108,7 +108,7 @@ guaranteeing persistence if one NMachine dies. Pulled from `api.nmachine.io`.
 
 1. **`user_vars`**. Assignments made by the user while operating their NMachine via the client app/site.  
 
-
+    
 The diagram below summarizes the manifest variable lifecycle by level:
 
 ![](/img/concepts/variables-lifecycle.png)

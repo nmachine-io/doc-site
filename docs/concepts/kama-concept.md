@@ -6,7 +6,7 @@ sidebar_label: KAMA
 # Kubernetes Application Management API (KAMA)
 
 The KAMA is your NMachine's backend. Recall that NMachine lets publishers
-**[digitize operational knowledge](/concepts/concepts-root#digitizing-operational-knowledge)**;
+**[digitize operational knowledge](/concepts/nmachine-concept#digitizing-operational-knowledge)**;
 the KAMA is where you encode that knowledge. 
 
 Structurally, the KAMA is an HTTP/JSON API consumed by the NMachine client. 

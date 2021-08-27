@@ -1,6 +1,6 @@
 ---
 sidebar_position: 0
-sidebar_label: Overview
+sidebar_label: NMachine
 ---
 
 # System Overview
@@ -11,7 +11,7 @@ You can think of NMachine as:
 - A Helm wrapper + Brigade substitute
 - A Platform as Code SDK
 - An application-specific Heroku factory
-- A Kubernetes B2B App Store
+- A Kubernetes App Store
 
 
 **In wordier terms**. NMachine gives software publishers an SDK to build an application-specific platforms 
@@ -89,19 +89,23 @@ The **[KAMA SDK](/concepts/kama-concept)** gives publishers a consistent
 system for modelling 
 rich, contextual, and interactive DevOps workflows that users can execute with confidence.
 
-### Troubleshooting
+### Automated Troubleshooting
 
-Prior knowledge is obviously instrumental to fixing problems. A Kubernetes developer
-is often aware of the bad states the system can end up in; it's then a question of doing
-the right diagnosis and not botching the remediation. That's why NMachine
-lets the publisher create remediation options for failed health checks or actions.
+An incident in a Kubernetes app rarely comes as a complete surprise to the system's engineers, for they know its secrets. 
+For anybody outside the loop, on the other hand, troubleshooting is an agonizingly heuristic-poor search problem. 
+The **[KAMA SDK](/concepts/kama-concept)** 
+lets publishers intelligently match failures to **[Remediation Options](/nope)**, 
+and send obfuscated dumps to the cloud for human review.
 
-### Organization
 
-With real world, complex, microservice-based application it's not all 
-obvious _where things are_. NMachine gives publishers complete freedom to define
-dashboards with any kind of data (Kubernetes or not) that makes the most sense for their 
-unique application.
+### Specific & Purposeful Dashboards
+
+_What matters_, and in _what context_, isn't obvious in a microservice-rich 
+Kubernetes application that you did not write yourself. Dashboards that just tabulate `kubectl get <kind>` help, but only so much. 
+So, NMachine's **[View Specs](/prebuilt-models/view-specs/view-spec-overview)** lets publishers build up
+purposeful, multi-page, dashboards from grids, tables, panels, graphs, and more, without any HTML or Javascript.
+
+
  
 
 
@@ -122,7 +126,7 @@ to self-host or outsource its two main components - the
 
 ### NMachine's Four Components
 
-![](/img/concepts/overview-system.jpg)
+![](/img/concepts/system.png)
 
 #### NMachine Client
 

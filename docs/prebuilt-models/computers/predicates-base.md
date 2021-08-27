@@ -7,38 +7,42 @@ sidebar_position: 1
 
 ## The `Predicate` Model
 
-A `Predicate` is a `Supplier` subclass that that can only resolve to `True/False`. 
-Most predicates work by comparing 
-two values: `challenge` and `check_against`. An example predicate that checks 
+A `Predicate` models a boolean function - one that usually compares two operands - 
+given by the attributes `challenge` and `check_against`. An example predicate that checks 
 whether `5 > 4`:
 
-```yaml
+```yaml title="examples/descriptors/computers/predicates.yaml"
 kind: Predicate
-id: "my-predicate"
-operator: "greater-than"
-challenge: 5
+id: "greater-than-four"
+operator: ">"
 check_against: 4
 ```  
 
-Running it:
+Result:
 
 ```python title="$ python main.py console"
-predicate = Predicate.inflate('my-predicate')
-predicate.resolve()
-# => True
+>>> predicate = Predicate.inflate("greater-than-four", patch={'challenge': 5})
+>>> predicate.resolve()
+True
+
+>>> predicate = Predicate.inflate("greater-than-four", patch={'challenge': 3})
+>>> predicate.resolve()
+False
 ```
 
 
 ### Attributes Table
 
-| Key                      | Type   | Cached? | Lookback | Notes                                                                  |
+| Key                      | Type    | Notes                                                                  |
 |--------------------------|--------|---------|----------|------------------------------------------------------------------------|
-| `challenge` **required** | `Any`  | Yes     | No       | Left operand if a binary operation, or sole operand if unary operation |
-| `check_against`          | `Any`  | Yes     | No       | Right operand if a binary operation, ignored otherwise                 |
-| `operator` (`equals`)    | `str`  | No      | No       | Logical operator. See list for supported operator                      |
-| `negate`                 | `bool` | No      | No       | If true, flip the original computation's result                        |
-| `reason`                 | `str`  | Yes     | Yes      | Message to be displayed to the user if evaluates to false              |
-| `fatal` (`True`)         | `bool` | No      | No       | Used by called to determine what happens if evaluates to false         |
+| `challenge` **required** | `Any`  | Left operand if a binary operation, or sole operand if unary operation |
+| `check_against`          | `Any`  | Right operand if a binary operation, ignored otherwise                 |
+| `operator`               | `str`  | Logical operator. See list for supported operator                      |
+| `negate`                 | `bool` | If true, flips the original computation's result                        |
+| `reason`                 | `str`  | Message to be displayed to the user if evaluates to false              |
+| `fatal` (`True`)         | `bool` | Used by called to determine what happens if evaluates to false         |
+
+
 
 
 ### Operators
@@ -57,7 +61,7 @@ check_against 1
 
 Any `Predicate` or its subclass can perform the following:
 
-| `operator` (aliases) | `challenge`    | `predicate`    | True if                                                         |
+| `operator` (aliases) | `challenge`    | `check_against`    | True Examples                                                         |
 |----------------------|----------------|----------------|-----------------------------------------------------------------|
 | `equals` (`==`)          | Any            | Any            | `"foo" == "foo"'`, `1 == 1`, `3 == "3"`, `None == None`         |
 | `not-equals` (`!=`, `=/=`) | Any            | Any            | Opposite of `equals`                                            |
@@ -91,23 +95,36 @@ supplied. Explained by example:
 
 
 
+
+
 ## The `MultiPredicate` Model
 
-Use the `MultiPredicate` subclass to perform AND/OR operations
-on other predicates:
+Use the `MultiPredicate` subclass to perform AND/OR operations on other predicates.
 
-```yaml
+
+### Example:
+
+```yaml title="examples/descriptors/computers/predicates.yaml"
 kind: MultiPredicate
+id: "true-and-false"
 operator: and
 predicates:
 
   - kind: Predicate
-    challenge: foo
-    check_against: foo
-  
+    challenge: "foo"
+    check_against: "foo"
+
   - kind: Predicate
-    challenge: bar
-    check_against: baz   
+    challenge: "bar"
+    check_against: "baz
+```
+
+Result:
+
+```python title="$ python main.py console"
+>>> predicate = Predicate.inflate("true-and-false")
+>>> predicate.resolve()
+False
 ```
 
 The legal operator values are `and` and `or` in lower case. Anything else
