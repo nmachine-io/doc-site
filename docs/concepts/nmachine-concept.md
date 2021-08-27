@@ -124,38 +124,38 @@ to self-host or outsource its two main components - the
 **[KAMA](/concepts/kama-concept)** and **[KTEA](/concepts/ktea-concept)**. 
 
 
-### NMachine's Four Components
+### Components
 
 ![](/img/concepts/system.png)
 
 #### NMachine Client
 
-This is what the end-user (i.e the application operator) sees. It is the dashboard
-that lets end-users install/operate apps provided by publishers. One client can 
-show multiple NMachines (e.g apps) across multiple Kubernetes clusters. 
-For a given NMachine, the client client populates its UI by making calls to the 
-corresponding [KAMA server](#kama-server).
+The **[Desktop](/nope)** or **[Web](/nope)** app that the end-user (i.e the application operator) 
+interacts with. Communicates with the **[KAMA Server](/concepts/kama-concept.md)** in order to render information 
+and perform actions that let the user operate the publisher's app.
 
 #### KAMA Server
 
-In a word, the KAMA Server is the API that serves the logic that the publisher wrote to 
-[digitize operational knowledge](#digitizing-operational-knowledge) of their system. It is 
-the most important component.
-Read the full [KAMA Page](/concepts/kama-concept.md)
+The backend responsible for 
+**[digitizing operational knowledge](#digitizing-operational-knowledge)**, as well as communicating with
+the templating engine (the **[KTEA](/concepts/ktea-concept.md)**), and the user's Kubernetes cluster. Where
+your _code_ in NMachine's _as code_ lives & runs. Open source. Read on **[here](/concepts/kama-concept)**.
 
 #### KTEA Server
 
-A KTEA server essentially serves a manifest templating tool (like Helm) over HTTP/JSON. The
-KAMA talks to it whenever it needs to generate a new manifest, e.g because a variable has changed.
-Read the full [KTEA Page](/concepts/ktea-concept.md)
+Serves a Kubernetes templating engine as a web-based JSON API. You can 
+turn existing **[Helm charts into KTEAs](/tutorials/helm-to-ktea-tutorial)** in seconds,
+as well as serve **[other templating engines](/)** easily. 
+Open source. Read on **[here](/tutorials/any-to-ktea)**.
 
 #### User Kubernetes Cluster
 
-The cluster where the user wants the publisher's application to run. NMachine is entirely
-agnostic to the cluster's properties. Compatibility issues are the publisher's responsibility
-to flag using preflight-checks at installation time.
+The cluster inside which the user runs the publisher's application. NMachine is entirely
+cluster provider agnostic. Users must currently bring their own clusters, but
+NMachine-provided clusters will **[soon be available](/nope)**.
 
 #### NMachine Cloud API
 
-The API at `api.nmachine.io` does two things: 1) give metadata about individual NMachines,
-and 2) injest telemetry created by the KAMA. NMachines can be made to run air-gapped.
+Provides real-time services to NMachines, like application metadata, updates and custom variables. 
+Also injests telemetry data from deployed NMachines for later consumption in the
+ **[Publisher Dashboard](https://publish.nmachine.io)**.
