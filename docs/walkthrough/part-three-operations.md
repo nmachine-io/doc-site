@@ -59,9 +59,9 @@ and running the command inside:
 
 ```bash title="$"
 $ kubectl exec --stdin --tty monolith-<YOUR-POD> -n ice-kream  -- /bin/sh
-# pwd
+$ pwd
 /app
-# bundle exec rake seed:admin[hello@example.com,password]
+$ bundle exec rake seed:admin[hello@example.com,password]
 D, [2021-08-22T20:58:05.497043 #25] DEBUG -- :    (0.3ms)  BEGIN
 D, [2021-08-22T20:58:05.503112 #25] DEBUG -- :   AdminUser Exists (1.1ms)  SELECT  1 AS one FROM "admin_users" WHERE "admin_users"."email" = $1 LIMIT $2  [["email", "hello@example.com"], ["LIMIT", 1]]
 D, [2021-08-22T20:58:05.638895 #25] DEBUG -- :   AdminUser Create (134.2ms)  INSERT INTO "admin_users" ("email", "encrypted_password", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"  [["email", "hello@example.com"], ["encrypted_password", "$2a$11$yT290E9K32FG22.TST6CLeJjNvWs2alaUNSXFR598d//5SP3QfAIa"], ["created_at", "2021-08-22 20:58:05.503942"], ["updated_at", "2021-08-22 20:58:05.503942"]]
@@ -197,24 +197,68 @@ We have the action, and we have the operation, but they're not yet talking to ea
 We want the `email` and `password` fields to be passed to our `app.action.seed_admin_shell_exec`
 action when the user clicks Submit. 
 
-Turning to the **[`Field` reference](/asd)**, we see that the `target` attribute is relevant to us.
+Turning to the **[`Field` reference](/nope)**, we see that **the `target` attribute is relevant** to us.
 We **don't** want to treat `admin` or `password` as manifest variables; we just want to keep them in 
 memory. As such, let's add one line to each field:
 
 ```yaml title="descriptors/operations/seed_admin/operation.yaml"
 # operation.stages[0].steps[0]
-fields:
-  - kind: Field
-    id: "email"
-    target: "state"
+kind: Operation
+#...
+stages:
+  - kind: Stage
     #...
-  - kind: Field
-    id: "password"
-    target: "state"
-    #...
+    steps:
+      - kind: Step
+        #...
+        fields:
+          - kind: Field
+            id: "email"
+            target: "state"
+            #...
+          - kind: Field
+            id: "password"
+            target: "state"
 ``` 
 
-We can now safely access 
+We can now safely access the **`op_state`** attribute in our descriptors, which
+holds assignments made to date, as explained 
+the **[Operation Docs](/prebuilt-models/operations/operations-overview)**. Let's 
+point to our action and have it be inflated with `email` and `password`:
 
 
+```yaml title="descriptors/operations/seed_admin/operation.yaml"
+# operation.stages[0].steps[0]
+kind: Operation
+#...
+stages:
+  - kind: Stage
+    #...
+    steps:
+      - kind: Step
+        #...
+        action:
+          inherit: "app.action.seed_admin_shell_exec"
+          email: "get::self>>op_state->.email"
+          password: "get::self>>op_state->.password"
+``` 
+
+Finally, let's update our Action to read these variables:
+
+```yaml title="descriptors/operations/seed_admin/shell_action.yaml"
+kind: PodShellExecAction
+id: "app.action.seed_admin_shell_exec"
+params: "${get::self>>email},${get::self>>password}"
+command: "bundle exec rake seed:admin[${get::self>>params}]"
+#...
+```
+
+## 4. Have some Ice Kream
+
+You should now be able to access the application. You'll notice that the final
+[Ice Kream 🍦](https://github.com/nmachine-io/mono/tree/master/ice-kream) NMachine 
+has additional Operations. You can find their source code on
+[GitHub](https://github.com/nmachine-io/mono/tree/master/ice-kream/ice-kream-kama/descriptors/operations).
+
+![](/img/walkthrough/signed-in.png)
 
