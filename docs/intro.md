@@ -9,6 +9,8 @@ sidebar_label: Welcome
 Welcome to the NMachine documentation site. Here you will find the resources to
 develop and distribute your NMachine.  
 
+> NMachine lets you create application-specific platforms, as code, called NMachines, that your clients and teams can use to independently operate your Kubernetes application on their infrastructure in the real world.
+
 ## Learn the Concepts
 
 Start by building an understanding of core NMachine 
